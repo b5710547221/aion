@@ -8,7 +8,7 @@ export default function PhVerify() {
   return (
     <main className="w-full">
       <div className="w-full flex justify-center mt-8">
-           <Image  src={logo_aion} width={350} height={100}/>
+           <Image  alt="" src={logo_aion} width={350} height={100}/>
       </div>
       <div className="pl-8 pr-8 mt-12 relative w-full  h-14 input-component mb-5 w-full">
                     <input

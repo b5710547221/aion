@@ -7,10 +7,10 @@ export default function Home() {
   return (
     <main className="w-full">
       <div className="w-full flex justify-center mt-8">
-           <Image  src={logo_aion} width={350} height={100}/>
+           <Image alt="" src={logo_aion} width={350} height={100}/>
       </div>
       <div className="w-full flex justify-center mt-32">
-           <Image  src={text1} width={350} height={100}/>
+           <Image alt="" src={text1} width={350} height={100}/>
       </div>
       <div className="ml-8 mr-8">
           <Link href="/register">
