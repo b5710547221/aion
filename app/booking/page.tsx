@@ -38,35 +38,35 @@ export default function Booking() {
          <div className="flex flex-col gap-4 justify-center items-center w-full h-fit  pl-4 pr-4">
            <p className="text-left w-full pt-4">Mr : XXX XXXX</p>
                <div className="w-full h-27 ">
-               <a href="#" className="h-16  block max-w-sm pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+               <a href="#" className="h-16   block  pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
             
                     <p className="mb-2 text-blue1 text-sm font-bold tracking-tight text-gray-900 dark:text-white font-sm">Phone</p>
                     <p className="mb-2 font-normal text-gray1 dark:text-gray1 ">081-234-5678</p>
                     </a>
                </div>
                <div className="w-full h-27">
-               <a href="#" className="h-16 block max-w-sm pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+               <a href="#" className="h-16 block pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
             
                     <p className="mb-2 text-blue1 text-sm font-bold tracking-tight text-gray-900 dark:text-white font-sm">E-mail</p>
                     <p className="mb-2 font-normal text-gray1  dark:text-gray1 ">loremipsum@gmail.com</p>
                     </a>
                </div>
                <div className="w-full h-27">
-               <a href="#" className="h-16 block max-w-sm pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+               <a href="#" className="h-16 block pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
             
                     <p className="mb-2 text-blue1 text-sm font-bold tracking-tight text-gray-900 dark:text-white font-sm">Interested model</p>
                     <p className="mb-2 font-normal text-gray1  dark:text-gray1 ">Hyper HT</p>
                     </a>
                </div>
                <div className="w-full h-27">
-               <a href="#" className="h-16 block max-w-sm pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+               <a href="#" className="h-16 block  pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
             
                     <p className="mb-2 text-blue1 text-sm font-bold tracking-tight text-gray-900 dark:text-white font-sm">Plan for Car Purchasing</p>
                     <p className="mb-2 font-normal text-gray1  dark:text-gray1 ">1 month</p>
                     </a>
                </div>
                <div className="w-full h-27 mb-4">
-               <a href="#" className="h-16 block max-w-sm pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
+               <a href="#" className="h-16 block  pl-4 pr-4  bg-white border border-gray-200 rounded-2xl shadow hover:bg-gray-100 dark:bg-gray-800 dark:border-gray-700 dark:hover:bg-gray-700">
             
                     <p className="mb-2 text-blue1 text-sm font-bold tracking-tight text-gray-900 dark:text-white font-sm">Dealer</p>
                     <p className="mb-2 font-normal text-gray1  dark:text-gray1 ">V Group</p>
