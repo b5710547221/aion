@@ -20,7 +20,7 @@ export default function RootLayout({
       <head>
       </head>
       <body  className={inter.className}>{children}
-      <script src="https://unpkg.com/flowbite@1.5.1/dist/flowbite.js"></script>
+     
       </body>
     </html>
   )

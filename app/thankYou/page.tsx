@@ -15,7 +15,7 @@ export default function ThankYou() {
       </div>
       <div className="px-8 mt-4  w-full">
                         <Link href="\">
-                          <button className="  w-full h-12  bg-gray1  text-gray font-bold  mt-2 mb-2    rounded-xl">
+                          <button className=" w-full h-12  bg-gray1  text-gray font-bold  mt-2 mb-2    rounded-xl">
                               BACK TO HOME
                           </button>
                         </Link>

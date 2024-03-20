@@ -239,7 +239,7 @@ export default function Booking() {
                 </div>
                
               </div>
-              <p className="mb-2 ml-2 text-sm text-blue2">Do you have a driver's license?/ คุณมีใบขับขี่หรือไม่?*</p>
+              <p className="mb-2 ml-2 text-sm text-blue2">Do you have a driver license?/ คุณมีใบขับขี่หรือไม่?*</p>
                <div className=" flex columns-2 p-4">
                     <div className=" items-center w-full ">
                         <input id="link-checkbox" type="checkbox" value="" className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
