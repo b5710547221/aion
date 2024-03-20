@@ -1,14 +1,24 @@
+'use client'
 import { url } from "inspector";
 import Image from 'next/image';
 import logo_aion from './../../assets/images/aion_logo.png';
 import text1 from './../../assets/images/text.png'
 import text2 from './../../assets/images/booking.png'
-import React from 'react';
+import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
 import Link from "@/node_modules/next/link";
 
 export default function Booking() {
+     const [isOpen1, setOpen1] = useState(false);
 
+     const handleDropDown1 = () => {
+       setOpen1(!isOpen1);
+     };
+     const [isOpen2, setOpen2] = useState(false);
+
+  const handleDropDown2 = () => {
+    setOpen2(!isOpen2);
+  };
  
      
     
@@ -70,7 +80,7 @@ export default function Booking() {
          <div className="flex flex-col gap-4 justify-center items-center w-full h-fit  pl-4 pr-4">
          <div className=" relative   mt-4 h-12 input-component mb-5 w-full">
                     <div className="relative group ">
-                        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown1" className="text-gray-500 w-full h-14 border border-black bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                        <button onClick={handleDropDown1}id="dropdownDefaultButton" data-dropdown-toggle="dropdown1" className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-white dark:hover:bg-white dark:focus:ring-blue-800" type="button">
                         
                         <p className="w-full pr-16">25 มีนาคม 2567</p>
                         <div className="justify-end flex w-full">
@@ -80,8 +90,10 @@ export default function Booking() {
                         </div>
                         </button>
                          
-                    <div id="dropdown1" className=" h-36 overflow-auto w-full z-10 hidden bg-white border border-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 ">
-                        <ul className="w-full  text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                    <div id="dropdown1" className={` h-36 overflow-auto w-full  bg-white border border-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 ${
+                    isOpen1 ? "block" : "hidden"
+                         }`}>
+                        <ul className="z-10  w-full  text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
                             <a href="#" className="w-full block px-4 py-2  bg-low1 dark:hover:text-white">25 มีนาคม 2567 </a>
                         </li>
@@ -131,7 +143,7 @@ export default function Booking() {
                 </div>
                 <div className=" relative   mt-4 h-12 input-component mb-5 w-full">
                     <div className="relative group ">
-                        <button id="dropdownDefaultButton" data-dropdown-toggle="dropdown2" className="text-gray-500 w-full h-14 border border-black bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">
+                        <button onClick={handleDropDown2} id="dropdownDefaultButton" data-dropdown-toggle="dropdown2" className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-blue-600 dark:hover:bg-white dark:focus:ring-blue-800" type="button">
                         <p className="pl-4">11:00</p> 
                         <div className="justify-end flex w-full">
                             <svg className="w-2.5 h-2.5 ms-3 mr-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
@@ -140,8 +152,10 @@ export default function Booking() {
                         </div>
                         </button>
                          
-                    <div id="dropdown2" className="h-36 overflow-auto w-full z-10 hidden bg-white border border-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-                        <ul className="w-full  text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                    <div id="dropdown2" className={`h-36 overflow-auto w-full   bg-white border border-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 ${
+                         isOpen2 ? "block" : "hidden"
+                          }`}>
+                        <ul className="z-10  w-full  text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
                             <a href="#" className="w-full block px-4 py-2  bg-low1 dark:hover:text-white">11.00</a>
                         </li>
