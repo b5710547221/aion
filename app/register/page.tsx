@@ -88,7 +88,7 @@ export default function Register() {
                 <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-lg">
                     <div className="relative group ">
                         <button onClick={handleDropDown1} id="dropdownDefaultButton" data-dropdown-toggle="dropdown1" className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-white dark:hover:bg-white dark:focus:ring-blue-800" type="button">
-                        <p className="w-full pr-32"> Hyper HT</p>
+                        <p className="w-full pl-4 justify-start flex"> Hyper HT</p>
                         <div className="justify-end flex w-full">
                             <svg className="w-2.5 h-2.5 ms-3 mr-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
@@ -125,7 +125,7 @@ export default function Register() {
                 <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-xl">
                     <div className="relative group ">
                         <button onClick={handleDropDown2} id="dropdownDefaultButton2" data-dropdown-toggle="dropdown2" className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-white dark:hover:bg-white dark:focus:ring-blue-800" type="button">
-                        <p className="w-full pr-32">1 month</p>
+                        <p className="w-full pl-4 justify-start flex">1 month</p>
                         <div className="justify-end flex w-full">
                             <svg className="w-2.5 h-2.5 ms-3 mr-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
@@ -157,7 +157,7 @@ export default function Register() {
                <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-xl">
                     <div className="relative group ">
                         <button onClick={handleDropDown3} id="dropdownDefaultButton3" data-dropdown-toggle="dropdown3" className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm  py-2.5 text-right inline-flex items-center dark:bg-white dark:hover:bg-white dark:focus:ring-blue-800" type="button">
-                        <p className="w-full pr-32">V group</p>
+                        <p className="w-full pl-4 justify-start flex">V group</p>
                         <div className="justify-end flex w-full mr-4">
                             <svg className="w-2.5 h-2.5 ms-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>

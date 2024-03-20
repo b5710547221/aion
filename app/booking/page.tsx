@@ -82,7 +82,7 @@ export default function Booking() {
                     <div className="relative group ">
                         <button onClick={handleDropDown1}id="dropdownDefaultButton" data-dropdown-toggle="dropdown1" className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-white dark:hover:bg-white dark:focus:ring-blue-800" type="button">
                         
-                        <p className="w-full pr-16">25 มีนาคม 2567</p>
+                        <p className="w-full pl-4 justify-start flex">25 มีนาคม 2567</p>
                         <div className="justify-end flex w-full">
                             <svg className="w-2.5 h-2.5 ms-3 mr-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
@@ -144,7 +144,7 @@ export default function Booking() {
                 <div className=" relative   mt-4 h-12 input-component mb-5 w-full">
                     <div className="relative group ">
                         <button onClick={handleDropDown2} id="dropdownDefaultButton" data-dropdown-toggle="dropdown2" className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-blue-600 dark:hover:bg-white dark:focus:ring-blue-800" type="button">
-                        <p className="pl-4">11:00</p> 
+                        <p className="w-full pl-4 justify-start flex">11:00</p> 
                         <div className="justify-end flex w-full">
                             <svg className="w-2.5 h-2.5 ms-3 mr-4" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4"/>
