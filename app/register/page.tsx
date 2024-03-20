@@ -45,7 +45,7 @@ export default function Register() {
                 <div className="  relative w-full  mt-4 h-14 input-component mb-5 w-full">
                     <input
                         id="name"
-                        type="text"
+                        type="number"
                         name="name"
                         className="h-full w-full border  px-2 transition-all border-black rounded-lg"
                         placeholder="ชื่อ - สกุล"
@@ -59,10 +59,13 @@ export default function Register() {
                 <div className=" relative w-full  mt-4 h-14 input-component mb-5 w-full rounded-lg">
                     <input
                         id="Phone"
-                        type="text"
+                        type="email"
                         name="Phone"
                         className="h-full w-full border  px-2 transition-all border-black rounded-lg"
                         placeholder="012-345-6789"
+                        pattern="[1-9]{1}[0-9]{9}"
+                        title="Error Message"
+                        
                     />
                     <label htmlFor="Phone" className="absolute text-lg left-2 transition-all bg-white px-1">
                        Phone number / เบอร์โทรติดต่อ *
@@ -95,7 +98,7 @@ export default function Register() {
                          
                     <div id="dropdown1" className={`h-36 overflow-auto w-full  bg-white border border-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 ${
                         isOpen1 ? "block" : "hidden" }`}>
-                        <ul className="z-10  w-full  text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
+                        <ul className="z-20  w-full  text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
                             <a href="#" className="w-full block px-4 py-2  bg-low1 dark:hover:text-white">Hyper HT</a>
                         </li>
