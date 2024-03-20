@@ -8,10 +8,10 @@ export default function ThankYou() {
   return (
     <main className="w-full">
       <div className="w-full flex justify-center mt-8">
-           <Image alt="" src={logo_aion} width={350} height={100}/>
+           <Image alt="test" src={logo_aion} width={350} height={100}/>
       </div>
       <div className="w-full flex justify-center mt-72 mb-8">
-           <Image alt="" src={texttk} width={350} height={100}/>
+           <Image alt="test" src={texttk} width={350} height={100}/>
       </div>
       <div className="px-8 mt-4  w-full">
                         <Link href="\">

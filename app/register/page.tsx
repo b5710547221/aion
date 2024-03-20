@@ -18,10 +18,10 @@ export default function Register() {
     <div className="w-full mb-12 pl-8 pr-8  ">
       
       <div className="w-full flex justify-center  mt-8">
-           <Image alt="" src={logo_aion} width={350} height={100}/>
+           <Image alt="test" src={logo_aion} width={350} height={100}/>
       </div>
       <div className="w-full flex justify-center  mt-8">
-           <Image alt="" src={text2} width={350} height={100}/>
+           <Image alt="test" src={text2} width={350} height={100}/>
       </div>
     
       <div className="w-full  rounded overflow-hidden shadow-lg bg-white border  rounded-xl mt-8">
