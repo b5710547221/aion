@@ -226,7 +226,7 @@ export default function Booking2() {
                     <div className="mt-4 mr-2 w-full">
                        <Link href="/thankYou">
                         <button className="  w-full h-12  bg-gray1  text-gray font-bold  mt-2 mb-2    rounded-xl">
-                            SUMMIT
+                            SUBMIT
                         </button>
                         </Link>
                     </div>

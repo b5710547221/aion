@@ -213,7 +213,7 @@ export default function Register() {
                     <div className="ml-2 mr-2 w-full">
                         <Link href="/thankYou">
                         <button className="border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl">
-                            SUMMIT
+                            SUBMIT
                         </button>
                         </Link>
                     </div>  
