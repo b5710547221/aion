@@ -122,5 +122,5 @@ input:focus {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  width:280px; /* some width */
+  width:280px;
 }
