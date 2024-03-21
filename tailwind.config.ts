@@ -20,7 +20,7 @@ const config: Config = {
       'low1' : '#DBEBEF',
       'cream': '#FBFBFB',
       'gray1' : '#A3A8BB',
-      'blue1' :'##1B2F72',
+      'blue1' :'#1B2F72',
       'blue2' : '#1B2F72',
       'red' : '#FF0000',
       
@@ -28,7 +28,20 @@ const config: Config = {
     },
     extend: {
       fontFamily: {
-        boldFont: ["BoldFont", "AIONType-bold"],
+        deacon1: ['AIONType-regular', 'sans-serif'],
+        deacon2: ['AIONType-regular-italic', 'sans-serif'],
+        deacon3: ['AIONType-light', 'sans-serif'],
+        deacon4: ['AIONType-light-italic', 'sans-serif'],
+        deacon5: ['AIONType-bold', 'sans-serif'],
+        deacon6: ['AIONType-bold-italic','sans-serif'],
+        deacon7: ['Prompt-BlackItalic', 'sans-serif'],
+        deacon8: ['Prompt-Bold', 'sans-serif'],
+        deacon9: ['Prompt-BoldItalic', 'sans-serif'],
+        deacon10: ['Prompt-ExtraBold', 'sans-serif'],
+        deacon11: ['Prompt-ExtraBoldItalic', 'sans-serif'],
+        deacon12: ['Prompt-Italic','sans-serif'],
+        deacon13: ['Prompt-Regular','sans-serif'],
+        deacon14: ['Prompt-SemiBold','sans-serif'],
        
       },
       backgroundImage: {

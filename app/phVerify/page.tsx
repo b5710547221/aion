@@ -18,7 +18,7 @@ export default function PhVerify() {
                         className="h-full w-full border  px-2 transition-all border-black rounded-xl"
                         placeholder="012-345-6789"
                     />
-                    <label htmlFor="email" className="absolute text-lg left-2 transition-all bg-transparent px-1">
+                    <label htmlFor="email" className="font-deacon13 absolute text-lg left-2 transition-all bg-transparent px-1">
                         Phone Number / เบอร์โทรติดต่อ *
                     </label>
                 </div>

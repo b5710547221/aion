@@ -25,7 +25,6 @@ export default function Register() {
     setOpen3(!isOpen3);
     };
  
-     
     
     
   return (
@@ -35,8 +34,17 @@ export default function Register() {
       <div className="w-full flex justify-center  mt-8">
            <Image alt="test" src={logo_aion} width={350} height={100}/>
       </div>
-      <div className="w-full flex justify-center  mt-8">
-           <Image alt="test" src={text2} width={350} height={100}/>
+      <div className="w-full text-center mt-8">
+          {/*  <Image alt="test" src={text2} width={350} height={100}/> */}
+          <div>
+          <p className="font-deacon5 pr-32 text-white text-3xl">Registration</p>
+          </div>
+          <div>
+          <p  className="font-deacon8 text-white text-xl"><br/>AION Thailand @Motor Show 2024<br/></p>
+         </div>
+          <div>
+          <p className="font-deacon13 text-blue1 text-lg">Please Fill In All Required Information.</p>
+         </div> 
       </div>
     
       <div className="w-full   overflow-hidden shadow-lg bg-white border  rounded-lg mt-8">
@@ -45,12 +53,12 @@ export default function Register() {
                 <div className="  relative w-full  mt-4 h-14 input-component mb-5 w-full">
                     <input
                         id="name"
-                        type="number"
+                        type="text"
                         name="name"
                         className="h-full w-full border  px-2 transition-all border-black rounded-lg"
                         placeholder="ชื่อ - สกุล"
                     />
-                    <label htmlFor="name" className="absolute text-lg left-2 transition-all bg-white px-1">
+                    <label htmlFor="name" className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all bg-white px-1">
                         Name-Surname / ชื่อ-สกุล *
                     </label>
                 </div>
@@ -59,7 +67,7 @@ export default function Register() {
                 <div className=" relative w-full  mt-4 h-14 input-component mb-5 w-full rounded-lg">
                     <input
                         id="Phone"
-                        type="email"
+                        type="number"
                         name="Phone"
                         className="h-full w-full border  px-2 transition-all border-black rounded-lg"
                         placeholder="012-345-6789"
@@ -67,7 +75,7 @@ export default function Register() {
                         title="Error Message"
                         
                     />
-                    <label htmlFor="Phone" className="absolute text-lg left-2 transition-all bg-white px-1">
+                    <label htmlFor="Phone" className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all bg-white px-1">
                        Phone number / เบอร์โทรติดต่อ *
                     </label>
                 </div>
@@ -75,12 +83,12 @@ export default function Register() {
                 <div className=" relative w-full  mt-4 h-14 input-component mb-5 w-full rounded-lg">
                     <input
                         id="email"
-                        type="text"
+                        type="email"
                         name="email"
                         className="h-full w-full border  px-2 transition-all border-black rounded-lg"
                         placeholder="loremipsum@example.com"
                     />
-                    <label htmlFor="email" className="absolute text-lg left-2 transition-all bg-white px-1">
+                    <label htmlFor="email" className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all bg-white px-1">
                         E-mail
                     </label>
                 </div>
@@ -117,7 +125,7 @@ export default function Register() {
                         </ul>
                     </div>
                     </div>
-                    <label htmlFor="model" className="absolute text-lg left-2 transition-all text-black bg-white px-1">
+                    <label htmlFor="model" className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all text-black bg-white px-1">
                         Interested Model
                     </label>
                 </div>
@@ -149,7 +157,7 @@ export default function Register() {
                         </ul>
                     </div>
                     </div>
-                    <label htmlFor="model" className="absolute text-lg left-2 transition-all text-black bg-white px-1">
+                    <label htmlFor="model" className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all text-black bg-white px-1">
                         Plan for car percharsing
                     </label>
                 </div>
@@ -193,27 +201,27 @@ export default function Register() {
                         </ul>
                     </div>
                     </div>
-                    <label htmlFor="model" className="absolute text-lg left-2 transition-all text-black bg-white px-1">
+                    <label htmlFor="model" className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all text-black bg-white px-1">
                         Dealer
                     </label>
                 </div>
         
                         
-                    <div className="relative w-full px-4  mt-4 h-fit border border-black rounded-xl">
-                                <label className="mt-4 mb-4 text-black text-lg">
+                    <div className="relative w-full px-4 pr-4 mt-4 h-fit border border-black rounded-xl " >
+                                <label className="font-deacon13  mb-4 text-black text-lg">
                                     เมื่อผู้ลงทะเบียนกด ยอมรับ แสดงว่าคุณเข้าใจและตกลงที่จะอนุญาต ให้บริษัทฯ นำข้อมูลส่วนบุคคลของคุณไปใช้ในการทำสื่อโฆษณาประชาสัมพันธ์ติดตามสถานะและยอมรับการส่งเสริมการขายโปรดตรวจสอบนโยบายความเป็นส่วนตัวของเราโดยละเอียด ตามลิ้งค์แนบ 
                                     
                                 </label>
-                                <Link href="https://www.aionauto.com/privacy/agreement"></Link><label className="text-black text-underline">https://www.aionauto.com/privacy/agreement</label>
+                                <div id="link1"><Link href="https://www.aionauto.com/privacy/agreement"><label  className=" text-black text-underline text-blue1 text-lg font-deacon13"> https://www.aionauto.com/privacy/agreement</label></Link></div>
                     </div>
                     <div className=" items-center w-full ">
                         <input id="link-checkbox" type="checkbox" value="" className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"/>
-                        <label  className="ms-2 text-lg  text-gray-900 dark:text-gray-300">ยอมรับ</label>
+                        <label  className="ms-2 text-lg  text-gray-900 dark:text-gray-300 font-deacon13">ยอมรับ</label>
                     </div>
                     <div className="ml-2 mr-2 w-full">
                         <Link href="/thankYou">
                         <button className="border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl">
-                            SUBMIT
+                           SUBMIT
                         </button>
                         </Link>
                     </div>  

@@ -11,7 +11,8 @@ export default function ThankYou() {
            <Image alt="test" src={logo_aion} width={350} height={100}/>
       </div>
       <div className="w-full flex justify-center mt-72 mb-8">
-           <Image alt="test" src={texttk} width={350} height={100}/>
+         {/*   <Image alt="test" src={texttk} width={350} height={100}/> */}
+         <p  className="font-deacon5 text-white text-4xl">Thank You</p>
       </div>
       <div className="px-8 mt-4  w-full">
                         <Link href="\">

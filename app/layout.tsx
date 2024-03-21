@@ -2,8 +2,10 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import './globals.css'
 import "tw-elements-react/dist/css/tw-elements-react.min.css";
+import local from 'next/font/local'
 
 const inter = Inter({ subsets: ['latin'] })
+
 
 export const metadata: Metadata = {
   title: 'Create Next App',
