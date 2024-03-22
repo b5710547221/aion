@@ -1,18 +1,192 @@
 "use client";
 import Link from "@/node_modules/next/link";
+import axios from "axios";
 import { Field, Form, Formik, FormikErrors } from "formik";
 import Image from "next/image";
-import { useCallback, useMemo, useState } from "react";
+import { Suspense, useCallback, useMemo, useState } from "react";
+import DatePicker from "react-datepicker";
 import Select from "react-select";
+import Swal from "sweetalert2";
 import { boolean, object, string } from "yup";
 import logo_aion from "./../../assets/images/aion_logo.png";
-import DatePicker from "react-datepicker";
-import axios from "axios";
-import Swal from "sweetalert2";
 
-import "react-datepicker/dist/react-datepicker.css";
+const dateSlot: any[] = [
+  {
+    value: "2024-03-25",
+    label: "25 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-27",
+    label: "27 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-28",
+    label: "28 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-29",
+    label: "29 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-30",
+    label: "30 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-31",
+    label: "31 มีนาคม 2567",
+  },
+  {
+    value: "2024-04-01",
+    label: "1 เมษายน 2567",
+  },
+  {
+    value: "2024-04-02",
+    label: "2 เมษายน 2567",
+  },
+  {
+    value: "2024-04-03",
+    label: "3 เมษายน 2567",
+  },
+  {
+    value: "2024-04-04",
+    label: "4 เมษายน 2567",
+  },
+  {
+    value: "2024-04-05",
+    label: "5 เมษายน 2567",
+  },
+  {
+    value: "2024-04-06",
+    label: "6 เมษายน 2567",
+  },
+  {
+    value: "2024-04-07",
+    label: "7 เมษายน 2567",
+  },
+];
+
+const timeSlot: any[] = [
+  {
+    value: "11:00",
+    label: "11:00",
+  },
+  {
+    value: "11:15",
+    label: "11:15",
+  },
+  {
+    value: "11:30",
+    label: "11:30",
+  },
+  {
+    value: "11:45",
+    label: "11:45",
+  },
+  {
+    value: "12:00",
+    label: "12:00",
+  },
+  {
+    value: "12:15",
+    label: "12:15",
+  },
+  {
+    value: "12:30",
+    label: "12:30",
+  },
+  {
+    value: "12:45",
+    label: "12:45",
+  },
+  {
+    value: "13:00",
+    label: "13:00",
+  },
+  {
+    value: "13:15",
+    label: "13:15",
+  },
+  {
+    value: "13:30",
+    label: "13:30",
+  },
+  {
+    value: "13:45",
+    label: "13:45",
+  },
+  {
+    value: "14:00",
+    label: "14:00",
+  },
+  {
+    value: "14:15",
+    label: "14:15",
+  },
+  {
+    value: "14:30",
+    label: "14:30",
+  },
+  {
+    value: "14:45",
+    label: "14:45",
+  },
+  {
+    value: "15:00",
+    label: "15:00",
+  },
+  {
+    value: "15:15",
+    label: "15:15",
+  },
+  {
+    value: "15:30",
+    label: "15:30",
+  },
+  {
+    value: "15:45",
+    label: "15:45",
+  },
+  {
+    value: "16:00",
+    label: "16:00",
+  },
+  {
+    value: "16:15",
+    label: "16:15",
+  },
+  {
+    value: "16:30",
+    label: "16:30",
+  },
+  {
+    value: "16:45",
+    label: "16:45",
+  },
+  {
+    value: "17:00",
+    label: "17:00",
+  },
+  {
+    value: "17:15",
+    label: "17:15",
+  },
+  {
+    value: "17:30",
+    label: "17:30",
+  },
+  {
+    value: "17:45",
+    label: "17:45",
+  },
+  {
+    value: "18:00",
+    label: "18:00",
+  },
+];
+
 import dayjs from "dayjs";
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import "react-datepicker/dist/react-datepicker.css";
 export interface RegisterFormValues {
   name: string;
   email: string;
@@ -38,7 +212,7 @@ const yupSchema = object().shape({
   isLicensed: boolean(),
 });
 
-export default function Register() {
+function Register() {
   const [isLoad, setIsLoad] = useState(false);
   const router = useRouter();
   const query = useSearchParams();
@@ -366,9 +540,7 @@ export default function Register() {
                         { value: "Hangthaithada", label: "Hangthaithada" },
                       ]}
                       className={`w-full text-gray-500 border ${
-                        errors.dealer && touched.dealer
-                          ? "border-red"
-                          : "border-black"
+                        errors.dealer && touched.dealer ? "border-red" : ""
                       } bg-white hover:bg-white focus:ring-4 rounded-lg`}
                       onChange={(e) => {
                         setFieldValue("dealer", e?.value ?? "");
@@ -398,40 +570,35 @@ export default function Register() {
             </div>
 
             <div
-              className={`w-full   overflow-hidden shadow-lg bg-white border  rounded-lg mt-4 ${
+              className={`w-full shadow-lg bg-white border  rounded-lg mt-4 ${
                 step === 3 ? "flex" : "hidden"
               }`}
             >
               <div className="flex flex-col gap-8 justify-center items-center w-full h-fit my-4 pl-4 pr-4">
                 <div className="relative mt-4 h-12 input-component mb-5 w-full rounded-xl">
                   <div className="relative group ">
-                    <DatePicker
-                      selected={
-                        values.preferDateSlot !== ""
-                          ? dayjs(values.preferDateSlot).toDate()
-                          : dayjs().toDate()
-                      }
+                    <Select
                       id="preferDateSlot"
-                      portalId="root-portal"
-                      onChange={(date) => {
-                        setFieldValue(
-                          "preferDateSlot",
-                          dayjs(date).format("YYYY-MM-DD")
-                        );
+                      inputId="preferDateSlot"
+                      menuPlacement="top"
+                      options={dateSlot}
+                      className={`w-full text-gray-500  ${
+                        errors.preferTimeSlot && touched.preferTimeSlot
+                          ? "border-red border"
+                          : ""
+                      } bg-white hover:bg-white focus:ring-4 rounded-lg`}
+                      onChange={(e) => {
+                        setFieldValue("preferDateSlot", e?.value ?? "");
                       }}
-                      customInput={
-                        <div
-                          className={`w-full text-gray-500 border ${
-                            errors.preferDateSlot && touched.preferDateSlot
-                              ? "border-red"
-                              : "border-black"
-                          } bg-white hover:bg-white focus:ring-4 rounded-lg w-full focus:border-blue1 h-14 flex items-center justify-center px-2`}
-                        >
-                          {values.preferDateSlot !== ""
-                            ? dayjs(values.preferDateSlot).format("DD-MMM-YYYY")
-                            : "Select Date"}
-                        </div>
-                      }
+                      styles={{
+                        control: (styles) => ({
+                          ...styles,
+                          borderColor:
+                            "border-color: rgb(0 0 0 / var(--tw-border-opacity))",
+                          borderRadius: "0.5rem",
+                          height: "3.5rem",
+                        }),
+                      }}
                     />
                   </div>
                   <label
@@ -446,17 +613,31 @@ export default function Register() {
                 </div>
 
                 <div className="  relative mt-4 h-14 input-component mb-5 w-full">
-                  <Field
-                    id="preferTimeSlot"
-                    type="text"
-                    name="preferTimeSlot"
-                    className={`h-full w-full border  px-2 transition-all  rounded-lg ${
-                      errors.preferTimeSlot && touched.preferTimeSlot
-                        ? "border-red"
-                        : "border-black"
-                    }`}
-                    placeholder="ex. 10:00 AM"
-                  />
+                  <div className="relative group ">
+                    <Select
+                      id="preferTimeSlot"
+                      inputId="preferTimeSlot"
+                      menuPlacement="top"
+                      options={timeSlot}
+                      className={`w-full text-gray-500  ${
+                        errors.preferTimeSlot && touched.preferTimeSlot
+                          ? "border-red border"
+                          : ""
+                      } bg-white hover:bg-white focus:ring-4 rounded-lg`}
+                      onChange={(e) => {
+                        setFieldValue("preferTimeSlot", e?.value ?? "");
+                      }}
+                      styles={{
+                        control: (styles) => ({
+                          ...styles,
+                          borderColor:
+                            "border-color: rgb(0 0 0 / var(--tw-border-opacity))",
+                          borderRadius: "0.5rem",
+                          height: "3.5rem",
+                        }),
+                      }}
+                    />
+                  </div>
                   <label
                     htmlFor="preferTimeSlot"
                     className="font-deacon13 text-blue1 absolute text-base left-2 transition-all bg-white px-1"
@@ -600,5 +781,12 @@ export default function Register() {
         )}
       </Formik>
     </div>
+  );
+}
+export default function MainPage() {
+  return (
+    <Suspense>
+      <Register />
+    </Suspense>
   );
 }

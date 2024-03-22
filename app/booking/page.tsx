@@ -1,13 +1,12 @@
 "use client";
-import Link from "@/node_modules/next/link";
-import Image from "next/image";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import logo_aion from "./../../assets/images/aion_logo.png";
-import { useRouter, useSearchParams } from "next/navigation";
 import axios from "axios";
-import Swal from "sweetalert2";
 import dayjs from "dayjs";
+import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Select from "react-select";
+import Swal from "sweetalert2";
+import logo_aion from "./../../assets/images/aion_logo.png";
 
 interface UserCreateDto {
   id?: number;
@@ -196,7 +195,7 @@ const timeSlot: any[] = [
   },
 ];
 
-export default function Booking() {
+function Booking() {
   const query = useSearchParams();
   const router = useRouter();
   // step by query param step
@@ -209,7 +208,6 @@ export default function Booking() {
     return newphone;
   }, [query]);
 
-  const [isOpen1, setOpen1] = useState(false);
   const [isLoad, setLoad] = useState(false);
   const [user, setUser] = useState<UserCreateDto>({
     name: "",
@@ -601,5 +599,12 @@ export default function Booking() {
         </button>
       </div>
     </div>
+  );
+}
+export default function MainPage() {
+  return (
+    <Suspense>
+      <Booking />
+    </Suspense>
   );
 }
