@@ -1,12 +1,9 @@
 'use client'
-import { url } from "inspector";
-import Image from "next/image";
-import logo_aion from './../../assets/images/aion_logo.png';
-import text1 from './../../assets/images/text.png'
-import text2 from './../../assets/images/booking.png'
-import React, { useState } from 'react';
-import ReactDOM from 'react-dom';
 import Link from "@/node_modules/next/link";
+import Image from "next/image";
+import { useState } from 'react';
+import logo_aion from './../../assets/images/aion_logo.png';
+import text2 from './../../assets/images/booking.png';
 
 export default function Booking2() {
     const [isOpen1, setOpen1] = useState(false);

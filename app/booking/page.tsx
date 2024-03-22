@@ -1,23 +1,342 @@
 "use client";
 import Link from "@/node_modules/next/link";
 import Image from "next/image";
-import { useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import logo_aion from "./../../assets/images/aion_logo.png";
+import { useRouter, useSearchParams } from "next/navigation";
+import axios from "axios";
+import Swal from "sweetalert2";
+import dayjs from "dayjs";
+import Select from "react-select";
+
+interface UserCreateDto {
+  id?: number;
+  name: string;
+  email: string;
+  phone: string;
+  interestModel?: string;
+  planForCarPercharsing?: string;
+  dealer?: string;
+  preferDateSlot?: Date;
+  preferTimeSlot?: string;
+  isLicensed?: boolean;
+}
+
+const dateSlot: any[] = [
+  {
+    value: "2024-03-25",
+    label: "25 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-27",
+    label: "27 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-28",
+    label: "28 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-29",
+    label: "29 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-30",
+    label: "30 มีนาคม 2567",
+  },
+  {
+    value: "2024-03-31",
+    label: "31 มีนาคม 2567",
+  },
+  {
+    value: "2024-04-01",
+    label: "1 เมษายน 2567",
+  },
+  {
+    value: "2024-04-02",
+    label: "2 เมษายน 2567",
+  },
+  {
+    value: "2024-04-03",
+    label: "3 เมษายน 2567",
+  },
+  {
+    value: "2024-04-04",
+    label: "4 เมษายน 2567",
+  },
+  {
+    value: "2024-04-05",
+    label: "5 เมษายน 2567",
+  },
+  {
+    value: "2024-04-06",
+    label: "6 เมษายน 2567",
+  },
+  {
+    value: "2024-04-07",
+    label: "7 เมษายน 2567",
+  },
+];
+
+const timeSlot: any[] = [
+  {
+    value: "11:00",
+    label: "11:00",
+  },
+  {
+    value: "11:15",
+    label: "11:15",
+  },
+  {
+    value: "11:30",
+    label: "11:30",
+  },
+  {
+    value: "11:45",
+    label: "11:45",
+  },
+  {
+    value: "12:00",
+    label: "12:00",
+  },
+  {
+    value: "12:15",
+    label: "12:15",
+  },
+  {
+    value: "12:30",
+    label: "12:30",
+  },
+  {
+    value: "12:45",
+    label: "12:45",
+  },
+  {
+    value: "13:00",
+    label: "13:00",
+  },
+  {
+    value: "13:15",
+    label: "13:15",
+  },
+  {
+    value: "13:30",
+    label: "13:30",
+  },
+  {
+    value: "13:45",
+    label: "13:45",
+  },
+  {
+    value: "14:00",
+    label: "14:00",
+  },
+  {
+    value: "14:15",
+    label: "14:15",
+  },
+  {
+    value: "14:30",
+    label: "14:30",
+  },
+  {
+    value: "14:45",
+    label: "14:45",
+  },
+  {
+    value: "15:00",
+    label: "15:00",
+  },
+  {
+    value: "15:15",
+    label: "15:15",
+  },
+  {
+    value: "15:30",
+    label: "15:30",
+  },
+  {
+    value: "15:45",
+    label: "15:45",
+  },
+  {
+    value: "16:00",
+    label: "16:00",
+  },
+  {
+    value: "16:15",
+    label: "16:15",
+  },
+  {
+    value: "16:30",
+    label: "16:30",
+  },
+  {
+    value: "16:45",
+    label: "16:45",
+  },
+  {
+    value: "17:00",
+    label: "17:00",
+  },
+  {
+    value: "17:15",
+    label: "17:15",
+  },
+  {
+    value: "17:30",
+    label: "17:30",
+  },
+  {
+    value: "17:45",
+    label: "17:45",
+  },
+  {
+    value: "18:00",
+    label: "18:00",
+  },
+];
 
 export default function Booking() {
+  const query = useSearchParams();
+  const router = useRouter();
+  // step by query param step
+  const phone = useMemo(() => {
+    // get step from query
+    const newphone = query.get("phone");
+    if (!newphone || (newphone && newphone.length !== 10)) {
+      return null;
+    }
+    return newphone;
+  }, [query]);
+
   const [isOpen1, setOpen1] = useState(false);
+  const [isLoad, setLoad] = useState(false);
+  const [user, setUser] = useState<UserCreateDto>({
+    name: "",
+    email: "",
+    phone: "",
+    interestModel: "",
+    planForCarPercharsing: "",
+    dealer: "",
+    preferDateSlot: dayjs().toDate(),
+    preferTimeSlot: "",
+    isLicensed: false,
+  });
 
-  const handleDropDown1 = () => {
-    setOpen1(!isOpen1);
-  };
-  const [isOpen2, setOpen2] = useState(false);
+  const fetchUserbyPhone = useCallback(async (p: string) => {
+    try {
+      setLoad(true);
+      const response = await axios({
+        method: "GET",
+        url: "https://aion-api.showkhun.com/user?phone=" + p,
+        // url: "http://localhost:4000/user?phone=" + p,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+      });
+      if (response.data && response.data.isSussess) {
+        if ((response.data?.data?.data ?? []).length > 0) {
+          setUser(response.data?.data?.data[0]);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "User not found!",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => {
+            router.replace("/phVerify");
+          });
+        }
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        router.replace("/phVerify");
+      });
+    } finally {
+      setLoad(false);
+    }
+  }, []);
 
-  const handleDropDown2 = () => {
-    setOpen2(!isOpen2);
-  };
+  useEffect(() => {
+    try {
+      if (phone && phone.length === 10) {
+        fetchUserbyPhone(phone);
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: "Something went wrong!",
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        router.replace("/phVerify");
+      });
+    }
+  }, [phone]);
+
+  const handleUpdateData = useCallback(async (user: UserCreateDto) => {
+    try {
+      setLoad(true);
+      if (!user.id) throw new Error("User id not found");
+      if (!user.preferDateSlot) throw new Error("Prefer date slot not found");
+      if (!user.preferTimeSlot) throw new Error("Prefer time slot not found");
+      if (!user.isLicensed) throw new Error("Is licensed not found");
+      const response = await axios({
+        method: "PUT",
+        url: "https://aion-api.showkhun.com/user/" + user.id,
+        // url: "http://localhost:4000/user",
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+        },
+        data: {
+          preferDateSlot: user.preferDateSlot,
+          preferTimeSlot: user.preferTimeSlot,
+          isLicensed: user.isLicensed,
+        },
+      });
+      if (response.data && response.data.isSussess) {
+        Swal.fire({
+          icon: "success",
+          title: "Success",
+          text: "Update user data success!",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          router.replace("/phVerify");
+        });
+      }
+    } catch (error) {
+      Swal.fire({
+        icon: "error",
+        title: "Oops...",
+        text: (error as Error).message,
+        showConfirmButton: false,
+        timer: 1500,
+      }).then(() => {
+        router.replace("/phVerify");
+      });
+    }
+  }, []);
 
   return (
     <div className="w-full mb-12 pl-8 pr-8  ">
+      {/* fullscreen loading */}
+      <div
+        className={`fixed top-0 left-0 z-50 w-full h-full bg-white bg-opacity-60 items-center justify-center ${
+          isLoad ? "flex" : "hidden"
+        }`}
+      >
+        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+
       <div className="w-full flex justify-center  mt-8">
         <Image alt="test" src={logo_aion} width={350} height={100} />
       </div>
@@ -42,7 +361,9 @@ export default function Booking() {
 
       <div className="w-full   bg-cream  overflow-hidden shadow-lg bg-blue-20 bg-opacity-60 border  rounded-2xl mt-8">
         <div className="flex flex-col gap-4 justify-center items-center w-full h-fit  pl-4 pr-4">
-          <p className="text-left w-full pt-4 font-deacon13">Mr : XXX XXXX</p>
+          <p className="text-left w-full pt-4 font-deacon13">
+            Mr : {user.name}
+          </p>
           <div className="w-full h-27 ">
             <a
               href="#"
@@ -52,7 +373,7 @@ export default function Booking() {
                 Phone
               </p>
               <p className="font-deacon13 mb-2 font-normal text-gray1 dark:text-gray1 ">
-                081-234-5678
+                {user.phone}
               </p>
             </a>
           </div>
@@ -65,7 +386,7 @@ export default function Booking() {
                 E-mail
               </p>
               <p className="font-deacon13 mb-2 font-normal text-gray1  dark:text-gray1 ">
-                loremipsum@gmail.com
+                {user.email}
               </p>
             </a>
           </div>
@@ -78,7 +399,7 @@ export default function Booking() {
                 Interested model
               </p>
               <p className="font-deacon13 mb-2 font-normal text-gray1  dark:text-gray1 ">
-                Hyper HT
+                {user.interestModel !== "" ? user.interestModel : "-"}
               </p>
             </a>
           </div>
@@ -91,7 +412,9 @@ export default function Booking() {
                 Plan for Car Purchasing
               </p>
               <p className="font-deacon13 mb-2 font-normal text-gray1  dark:text-gray1 ">
-                1 month
+                {user.planForCarPercharsing !== ""
+                  ? user.planForCarPercharsing
+                  : "-"}
               </p>
             </a>
           </div>
@@ -104,456 +427,93 @@ export default function Booking() {
                 Dealer
               </p>
               <p className="font-deacon13 mb-2 font-normal text-gray1  dark:text-gray1 ">
-                V Group
+                {user.dealer !== "" ? user.dealer : "-"}
               </p>
             </a>
           </div>
         </div>
       </div>
 
-      <div className="w-full   bg-cream  overflow-hidden shadow-lg bg-white border  rounded-2xl mt-8">
+      <div className="w-full   bg-cream shadow-lg border  rounded-2xl mt-8">
         <div className="flex flex-col gap-4 justify-center items-center w-full h-fit  pl-4 pr-4">
-          <div className=" relative   mt-4 h-12 input-component mb-5 w-full">
+          <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-xl">
             <div className="relative group ">
-              <button
-                onClick={handleDropDown1}
-                id="dropdownDefaultButton"
-                data-dropdown-toggle="dropdown1"
-                className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-white dark:hover:bg-white dark:focus:ring-blue-800"
-                type="button"
-              >
-                <p className="font-deacon13 w-full pl-4 justify-start flex">
-                  25 มีนาคม 2567
-                </p>
-                <div className="justify-end flex w-full">
-                  <svg
-                    className="w-2.5 h-2.5 ms-3 mr-4"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 10 6"
-                  >
-                    <path
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="m1 1 4 4 4-4"
-                    />
-                  </svg>
-                </div>
-              </button>
-
-              <div
-                id="dropdown1"
-                className={` h-36 overflow-auto w-full  bg-white border border-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 ${
-                  isOpen1 ? "block" : "hidden"
-                }`}
-              >
-                <ul
-                  className="z-10  w-full  text-sm text-gray-700 dark:text-gray-200"
-                  aria-labelledby="dropdownDefaultButton"
-                >
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                    >
-                      25 มีนาคม 2567{" "}
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2   dark:hover:text-white"
-                    >
-                      27 มีนาคม 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                    >
-                      28 มีนาคม 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2   dark:hover:text-white"
-                    >
-                      29 มีนาคม 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                    >
-                      30 มีนาคม 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2   dark:hover:text-white"
-                    >
-                      31 มีนาคม 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                    >
-                      1 มษายน 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2   dark:hover:text-white"
-                    >
-                      2 มษายน 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                    >
-                      3 มษายน 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2   dark:hover:text-white"
-                    >
-                      4 มษายน 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                    >
-                      5 มษายน 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2   dark:hover:text-white"
-                    >
-                      6 เมษายน 2567
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                    >
-                      7 เมษายน 2567
-                    </a>
-                  </li>
-                </ul>
-              </div>
+              <Select
+                id="preferDateSlot"
+                inputId="preferDateSlot"
+                menuPlacement="top"
+                value={
+                  user.preferDateSlot
+                    ? dateSlot.find((v) => {
+                        return (
+                          v.value ===
+                          dayjs(user.preferDateSlot).format("YYYY-MM-DD")
+                        );
+                      })
+                    : null
+                }
+                options={dateSlot}
+                className={`w-full text-gray-500 bg-white hover:bg-white focus:ring-4 rounded-lg`}
+                onChange={(e) => {
+                  setUser({
+                    ...user,
+                    preferDateSlot: dayjs(e.value).toDate(),
+                  });
+                }}
+                styles={{
+                  control: (styles) => ({
+                    ...styles,
+                    borderColor:
+                      "border-color: rgb(0 0 0 / var(--tw-border-opacity))",
+                    borderRadius: "0.5rem",
+                    height: "3.5rem",
+                  }),
+                }}
+              />
             </div>
             <label
               htmlFor="model"
-              className="font-deacon13 absolute text-sm left-2 transition-all text-blue2 bg-white px-1"
+              className="font-deacon13 text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
             >
               Prefer date slot / โปรดเลือกวัน
             </label>
           </div>
-          <div className=" relative   mt-4 h-12 input-component mb-5 w-full">
+          <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-xl">
             <div className="relative group ">
-              <button
-                onClick={handleDropDown2}
-                id="dropdownDefaultButton"
-                data-dropdown-toggle="dropdown2"
-                className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-blue-600 dark:hover:bg-white dark:focus:ring-blue-800"
-                type="button"
-              >
-                <p className="font-deacon13 w-full pl-4 justify-start flex">
-                  11:00
-                </p>
-                <div className="justify-end flex w-full">
-                  <svg
-                    className="w-2.5 h-2.5 ms-3 mr-4"
-                    aria-hidden="true"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 10 6"
-                  >
-                    <path
-                      stroke="currentColor"
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="m1 1 4 4 4-4"
-                    />
-                  </svg>
-                </div>
-              </button>
-
-              <div
-                id="dropdown2"
-                className={`h-36 overflow-auto w-full   bg-white border border-black divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700 ${
-                  isOpen2 ? "block" : "hidden"
-                }`}
-              >
-                <ul
-                  className="z-10  w-full  text-sm text-gray-700 dark:text-gray-200"
-                  aria-labelledby="dropdownDefaultButton"
-                >
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                    >
-                      11.00
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      11.15
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      11.30
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                    >
-                      11.45
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      12.00
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      12.15
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      12.30
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      12.45
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      13.00
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      13.15
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      13.30
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      13.45
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      14.00
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      14.15
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      14.30
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      14.45
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      15.00
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      15.15
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      15.30
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      15.45
-                    </a>
-                  </li>
-
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      16.00
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      16.15
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      16.30
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      16.45
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      17.00
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      17.15
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      17.30
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2  dark:hover:text-white"
-                    >
-                      17.45
-                    </a>
-                  </li>
-                  <li>
-                    <a
-                      href="#"
-                      className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                    >
-                      18.00
-                    </a>
-                  </li>
-                </ul>
-              </div>
+              <Select
+                id="preferTimeSlot"
+                inputId="preferTimeSlot"
+                menuPlacement="top"
+                options={timeSlot}
+                value={
+                  user.preferTimeSlot
+                    ? timeSlot.find((v) => v.value === user.preferTimeSlot)
+                    : null
+                }
+                className={`w-full text-gray-500 bg-white hover:bg-white focus:ring-4 rounded-lg`}
+                onChange={(e) => {
+                  setUser({ ...user, preferTimeSlot: e.value });
+                }}
+                styles={{
+                  control: (styles) => ({
+                    ...styles,
+                    borderColor:
+                      "border-color: rgb(0 0 0 / var(--tw-border-opacity))",
+                    borderRadius: "0.5rem",
+                    height: "3.5rem",
+                  }),
+                }}
+              />
             </div>
             <label
               htmlFor="model"
-              className="font-deacon13 absolute text-sm left-2 transition-all text-blue2 bg-white px-1"
+              className="font-deacon13 text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
             >
               Prefer time slot / โปรดเลือกรอบเวลา
             </label>
           </div>
         </div>
-        <p className="mb-2 ml-2 text-sm text-blue2 font-deacon13 ">
+        {/* <p className="mb-2 ml-2 text-sm text-blue2 font-deacon13 ">
           Do you have a driver license?/ คุณมีใบขับขี่หรือไม่?*
         </p>
         <div className=" flex columns-2 p-4">
@@ -579,17 +539,66 @@ export default function Booking() {
               ไม่มี
             </label>
           </div>
+        </div> */}
+        <div className="w-full text-left p-4">
+          <label className="font-bold text-base text-blue1">
+            Do you have a driver licnse? / คุณมีใบขับขี่หรือไม่ ?{" "}
+          </label>
+          <div className=" items-center w-full ">
+            {/* radiobox */}
+            <label className="ms-2 text-base  text-gray-900 dark:text-gray-300 font-deacon13 mr-5">
+              <input
+                id="isLicensed"
+                type="radio"
+                name="isLicensed"
+                value="true"
+                onChange={() => {
+                  return false;
+                }}
+                checked={user.isLicensed}
+                onClick={() => {
+                  setUser({ ...user, isLicensed: true });
+                }}
+                className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />{" "}
+              Yes/มี
+            </label>
+            <label className="ms-2 text-base  text-gray-900 dark:text-gray-300 font-deacon13">
+              <input
+                id="isLicensed"
+                type="radio"
+                name="isLicensed"
+                value="false"
+                onChange={() => {
+                  return false;
+                }}
+                checked={!user.isLicensed}
+                onClick={() => {
+                  setUser({ ...user, isLicensed: false });
+                }}
+                className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+              />{" "}
+              No/ไม่มี
+            </label>
+          </div>
         </div>
         <p className="text-center mb-2 ml-2 text-sm text-red">
           (การทดลองขับอนุญาตให้เฉพาะผู้ที่มีใบขับขี่เท่านั้น)
         </p>
       </div>
       <div className="mt-4 mr-2 w-full">
-        <Link href="\thankYou">
-          <button className=" font-deacon13  w-full h-12  bg-gray1  text-gray font-bold  mt-2 mb-2    rounded-xl">
-            SUBMIT
-          </button>
-        </Link>
+        <button
+          type="button"
+          className={`border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl`}
+          onClick={() => {
+            if (user.isLicensed) {
+              handleUpdateData(user);
+            }
+          }}
+          disabled={!user.isLicensed}
+        >
+          SUBMIT
+        </button>
       </div>
     </div>
   );

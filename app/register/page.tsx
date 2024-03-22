@@ -1,8 +1,8 @@
 "use client";
 import Link from "@/node_modules/next/link";
-import { Field, Form, Formik } from "formik";
+import { Field, Form, Formik, FormikErrors } from "formik";
 import Image from "next/image";
-import { useCallback, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import Select from "react-select";
 import { boolean, object, string } from "yup";
 import logo_aion from "./../../assets/images/aion_logo.png";
@@ -12,6 +12,7 @@ import Swal from "sweetalert2";
 
 import "react-datepicker/dist/react-datepicker.css";
 import dayjs from "dayjs";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 export interface RegisterFormValues {
   name: string;
   email: string;
@@ -22,24 +23,57 @@ export interface RegisterFormValues {
   preferDateSlot: string;
   preferTimeSlot: string;
   isLicensed: boolean;
+  approveCheckbox?: boolean;
 }
 
 const yupSchema = object().shape({
   name: string().required("Name is required").min(2),
-  email: string().email().required("Email is required").email(),
+  email: string(),
   phone: string().required("Phone is required").min(9).max(13),
-  interestModel: string().required("Interest Model is required"),
-  planForCarPercharsing: string()
-    .required("Plan for car percharsing is required")
-    .min(1),
-  dealer: string().required("Dealer is required"),
-  preferDateSlot: string().required("Prefer Date Slot is required"),
-  preferTimeSlot: string().required("Prefer Time Slot is required"),
-  isLicensed: boolean().required("Is Licensed is required"),
+  interestModel: string(),
+  planForCarPercharsing: string(),
+  dealer: string(),
+  preferDateSlot: string(),
+  preferTimeSlot: string(),
+  isLicensed: boolean(),
 });
 
 export default function Register() {
   const [isLoad, setIsLoad] = useState(false);
+  const router = useRouter();
+  const query = useSearchParams();
+  // step by query param step
+  const step = useMemo(() => {
+    // get step from query
+    const newStep = query.get("step");
+    if (!newStep) {
+      return 1;
+    }
+    // // pram.step is number 1 2 3
+    if (parseInt(newStep as string) > 3) {
+      return 1;
+    }
+    return parseInt(newStep as string);
+  }, [query]);
+  const checkStep1 = useCallback(
+    (errors: FormikErrors<RegisterFormValues>, values: RegisterFormValues) => {
+      if (
+        step === 1 &&
+        !errors.name &&
+        !errors.email &&
+        !errors.phone &&
+        !errors.interestModel &&
+        !errors.planForCarPercharsing &&
+        !errors.dealer &&
+        values.name !== "" &&
+        values.phone !== ""
+      ) {
+        return true;
+      }
+      return false;
+    },
+    []
+  );
   const handleSubmit = useCallback(async (values: RegisterFormValues) => {
     setIsLoad(true);
     try {
@@ -49,7 +83,7 @@ export default function Register() {
         headers: {
           "Content-Type": "application/json; charset=utf-8",
         },
-        data: values,
+        data: { ...values, approveCheckbox: undefined },
       });
       if (response.data && response?.data?.isSussess) {
         Swal.fire({
@@ -59,7 +93,7 @@ export default function Register() {
           timer: 2000,
           showConfirmButton: false,
         }).then(() => {
-          location.href = "/thankYou";
+          router.replace("/thankYou");
         });
       } else {
         Swal.fire({
@@ -120,6 +154,7 @@ export default function Register() {
           preferDateSlot: dayjs().format("YYYY-MM-DD"),
           preferTimeSlot: "10:00 AM",
           isLicensed: true,
+          approveCheckbox: undefined,
         }}
         onSubmit={async (values: RegisterFormValues) => {
           await handleSubmit(values);
@@ -128,13 +163,18 @@ export default function Register() {
       >
         {({ errors, touched, setFieldValue, values }) => (
           <Form>
-            <div className="w-full   overflow-hidden shadow-lg bg-white border  rounded-lg mt-8">
+            <div
+              className={`w-full overflow-hidden shadow-lg bg-white border  rounded-lg mt-8 bg-opacity-70 ${
+                step === 1 ? "flex" : "hidden"
+              }`}
+            >
               <div className="flex flex-col gap-8 justify-center items-center w-full h-fit my-4 pl-4 pr-4">
-                <div className="  relative mt-4 h-14 input-component mb-5 w-full">
+                <div className="relative mt-4 h-14 input-component mb-5 w-full">
                   <Field
                     id="name"
                     type="text"
                     name="name"
+                    disabled={step > 1}
                     className={`h-full w-full border  px-2 transition-all  rounded-lg ${
                       errors.name && touched.name
                         ? "border-red"
@@ -144,9 +184,9 @@ export default function Register() {
                   />
                   <label
                     htmlFor="name"
-                    className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all bg-white px-1"
+                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all bg-white px-1"
                   >
-                    Name-Surname / ชื่อ-สกุล *
+                    Name-Surname / ชื่อ-สกุล <span className="text-red">*</span>
                   </label>
                   {errors.name && touched.name && (
                     <small className="text-red">{errors.name}</small>
@@ -158,6 +198,7 @@ export default function Register() {
                     id="phone"
                     type="text"
                     name="phone"
+                    disabled={step > 1}
                     className={`h-full w-full border  px-2 transition-all  rounded-lg ${
                       errors.phone && touched.phone
                         ? "border-red"
@@ -165,18 +206,27 @@ export default function Register() {
                     }`}
                     placeholder="012-345-6789"
                     pattern="[0-9]{3}-[0-9]{3}-[0-9]{4}"
+                    maxLength={10}
                     // display by pattern
                     value={values.phone.replace(
                       /(\d{3})(\d{3})(\d{4})/,
                       "$1-$2-$3"
                     )}
+                    // input number only
+                    onInput={(e: any) => {
+                      e.currentTarget.value = e.currentTarget.value.replace(
+                        /[^0-9]/g,
+                        ""
+                      );
+                    }}
                     title="Error Message"
                   />
                   <label
                     htmlFor="phone"
-                    className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all bg-white px-1"
+                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all bg-white px-1"
                   >
-                    Phone number / เบอร์โทรติดต่อ *
+                    Phone number / เบอร์โทรติดต่อ{" "}
+                    <span className="text-red">*</span>
                   </label>
                 </div>
 
@@ -189,10 +239,11 @@ export default function Register() {
                       errors.email && touched.email ? "border-red" : ""
                     }`}
                     placeholder="loremipsum@example.com"
+                    disabled={step > 1}
                   />
                   <label
                     htmlFor="email"
-                    className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all bg-white px-1"
+                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all bg-white px-1"
                   >
                     E-mail
                   </label>
@@ -203,88 +254,6 @@ export default function Register() {
 
                 <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-lg">
                   <div className="relative group ">
-                    {/* <button
-                      onClick={handleDropDown1}
-                      id="dropdownDefaultButton"
-                      data-dropdown-toggle="dropdown1"
-                      className="text-gray-500 w-full h-14 border border-black bg-white hover:bg-white focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm py-2.5 text-right inline-flex items-center dark:bg-white dark:hover:bg-white dark:focus:ring-blue-800 z-10"
-                      type="button"
-                    >
-                      <p className="w-full pl-4 justify-start flex">
-                        {" "}
-                        Hyper HT
-                      </p>
-                      <div className="justify-end flex w-full">
-                        <svg
-                          className="w-2.5 h-2.5 ms-3 mr-4"
-                          aria-hidden="true"
-                          xmlns="http://www.w3.org/2000/svg"
-                          fill="none"
-                          viewBox="0 0 10 6"
-                        >
-                          <path
-                            stroke="currentColor"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            strokeWidth="2"
-                            d="m1 1 4 4 4-4"
-                          />
-                        </svg>
-                      </div>
-                    </button>
-
-                    <div
-                      id="dropdown1"
-                      className={`h-36 overflow-auto w-full  bg-white border border-black divide-y divide-gray-100 rounded-lg shadow xl:w-44 dark:bg-gray-700 ${
-                        isOpen1 ? "block" : "hidden"
-                      } z-20`}
-                    >
-                      <ul
-                        className="z-20  w-full  text-sm text-gray-700 dark:text-gray-200"
-                        aria-labelledby="dropdownDefaultButton"
-                      >
-                        <li>
-                          <a
-                            href="#"
-                            className="w-full block px-4 py-2  bg-low1 dark:hover:text-white"
-                          >
-                            Hyper HT
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="w-full  block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            Hyper SSR
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="w-full block px-4 py-2 bg-low1 dark:hover:text-white"
-                          >
-                            Y Plus Premium 490
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="w-full  block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
-                          >
-                            Y Plus Premium 410
-                          </a>
-                        </li>
-                        <li>
-                          <a
-                            href="#"
-                            className="w-full  block px-4 py-2 bg-low1 dark:hover:text-white"
-                          >
-                            Y Plus Elite
-                          </a>
-                        </li>
-                      </ul>
-                    </div> */}
                     <Select
                       id="interestModel"
                       inputId="interestModel"
@@ -301,6 +270,7 @@ export default function Register() {
                         },
                         { value: "Y Plus Elite", label: "Y Plus Elite" },
                       ]}
+                      isDisabled={step > 1}
                       className={`w-full text-gray-500 border ${
                         errors.interestModel && touched.interestModel
                           ? "border-red"
@@ -322,7 +292,7 @@ export default function Register() {
                   </div>
                   <label
                     htmlFor="interestModel"
-                    className="font-deacon13 absolute text-lg left-2 transition-all text-black bg-white px-1"
+                    className="font-deacon13 absolute text-base left-2 transition-all text-black bg-white px-1"
                   >
                     Interested Model
                   </label>
@@ -350,6 +320,7 @@ export default function Register() {
                       onChange={(e) => {
                         setFieldValue("planForCarPercharsing", e?.value ?? 0);
                       }}
+                      isDisabled={step > 1}
                       styles={{
                         control: (styles) => ({
                           ...styles,
@@ -363,7 +334,7 @@ export default function Register() {
                   </div>
                   <label
                     htmlFor="planForCarPercharsing"
-                    className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all xl:text-black bg-white px-1"
+                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
                     Plan for car percharsing
                   </label>
@@ -380,6 +351,8 @@ export default function Register() {
                     <Select
                       id="dealer"
                       inputId="dealer"
+                      isDisabled={step > 1}
+                      menuPlacement="top"
                       options={[
                         { value: "V Group", label: "V Group" },
                         { value: "Gold integrate", label: "Gold integrate" },
@@ -413,7 +386,7 @@ export default function Register() {
                   </div>
                   <label
                     htmlFor="model"
-                    className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all xl:text-black bg-white px-1"
+                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
                     Dealer
                   </label>
@@ -421,7 +394,15 @@ export default function Register() {
                     <small className="text-red">{errors.dealer}</small>
                   )}
                 </div>
+              </div>
+            </div>
 
+            <div
+              className={`w-full   overflow-hidden shadow-lg bg-white border  rounded-lg mt-4 ${
+                step === 3 ? "flex" : "hidden"
+              }`}
+            >
+              <div className="flex flex-col gap-8 justify-center items-center w-full h-fit my-4 pl-4 pr-4">
                 <div className="relative mt-4 h-12 input-component mb-5 w-full rounded-xl">
                   <div className="relative group ">
                     <DatePicker
@@ -455,9 +436,9 @@ export default function Register() {
                   </div>
                   <label
                     htmlFor="preferDateSlot"
-                    className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all xl:text-black bg-white px-1"
+                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
-                    Prefer date slot / โปรดล็อกวัน
+                    Prefer date slot
                   </label>
                   {errors.preferDateSlot && touched.preferDateSlot && (
                     <small className="text-red">{errors.dealer}</small>
@@ -478,7 +459,7 @@ export default function Register() {
                   />
                   <label
                     htmlFor="preferTimeSlot"
-                    className="font-deacon13 text-blue1 absolute text-lg left-2 transition-all bg-white px-1"
+                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all bg-white px-1"
                   >
                     Prefer time slot
                   </label>
@@ -488,12 +469,12 @@ export default function Register() {
                 </div>
 
                 <div className="w-full text-left">
-                  <label className="font-bold text-lg text-blue1">
+                  <label className="font-bold text-base text-blue1">
                     Do you have a driver licnse? / คุณมีใบขับขี่หรือไม่ ?{" "}
                   </label>
                   <div className=" items-center w-full ">
                     {/* radiobox */}
-                    <label className="ms-2 text-lg  text-gray-900 dark:text-gray-300 font-deacon13 mr-5">
+                    <label className="ms-2 text-base  text-gray-900 dark:text-gray-300 font-deacon13 mr-5">
                       <input
                         id="isLicensed"
                         type="radio"
@@ -508,7 +489,7 @@ export default function Register() {
                       />{" "}
                       Yes/มี
                     </label>
-                    <label className="ms-2 text-lg  text-gray-900 dark:text-gray-300 font-deacon13">
+                    <label className="ms-2 text-base  text-gray-900 dark:text-gray-300 font-deacon13">
                       <input
                         id="isLicensed"
                         type="radio"
@@ -525,17 +506,25 @@ export default function Register() {
                     </label>
                   </div>
                 </div>
+              </div>
+            </div>
 
-                <div className="relative w-full px-4 pr-4 mt-4 h-fit border border-black rounded-xl ">
-                  <label className="font-deacon13  mb-4 text-black text-lg">
+            <div
+              className={`w-full   overflow-hidden shadow-lg bg-white border  rounded-lg mt-4 ${
+                step === 2 ? "flex" : "hidden"
+              }`}
+            >
+              <div className="flex flex-col gap-8 justify-center items-center w-full my-4 pl-4 pr-4">
+                <div className="relative w-full px-4 pr-4 mt-4 border border-black rounded-xl">
+                  <div className="font-deacon13  mb-4 text-black text-lg">
                     เมื่อผู้ลงทะเบียนกด ยอมรับ
                     แสดงว่าคุณเข้าใจและตกลงที่จะอนุญาต ให้บริษัทฯ
                     นำข้อมูลส่วนบุคคลของคุณไปใช้ในการทำสื่อโฆษณาประชาสัมพันธ์ติดตามสถานะและยอมรับการส่งเสริมการขายโปรดตรวจสอบนโยบายความเป็นส่วนตัวของเราโดยละเอียด
                     ตามลิ้งค์แนบ
-                  </label>
-                  <div id="link1">
+                  </div>
+                  <div>
                     <Link href="https://www.aionauto.com/privacy/agreement">
-                      <label className=" text-black text-underline xl:text-blue1 text-lg font-deacon13">
+                      <label className=" text-black text-underline xl:text-blue1 text-base font-deacon13">
                         {" "}
                         https://www.aionauto.com/privacy/agreement
                       </label>
@@ -543,24 +532,68 @@ export default function Register() {
                   </div>
                 </div>
                 <div className=" items-center w-full ">
-                  <input
-                    id="link-checkbox"
-                    type="checkbox"
-                    value=""
-                    className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
-                  />
-                  <label className="ms-2 text-lg  text-gray-900 dark:text-gray-300 font-deacon13">
+                  <label className="ms-2 text-base  text-gray-900 dark:text-gray-300 font-deacon13">
+                    <Field
+                      id="approveCheckbox"
+                      type="checkbox"
+                      value="true"
+                      onChange={() => {
+                        setFieldValue(
+                          "approveCheckbox",
+                          values.approveCheckbox ? false : true
+                        );
+                      }}
+                      checked={values.approveCheckbox}
+                      className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />{" "}
                     ยอมรับ
                   </label>
                 </div>
-                <div className="ml-2 mr-2 w-full">
-                  <button
-                    type="submit"
-                    className="border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl"
-                  >
-                    SUBMIT
-                  </button>
-                </div>
+              </div>
+            </div>
+            <div className={`w-full mt-4 ${step < 3 ? "flex" : "hidden"}`}>
+              <button
+                type="button"
+                className={`border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl ${
+                  checkStep1(errors, values) ? "" : "cursor-not-allowed"
+                }`}
+                onClick={() => {
+                  if (checkStep1(errors, values)) {
+                    // scroll to error element
+                    if (document) {
+                      const errorElement =
+                        document.querySelector(".border-red");
+                      errorElement?.scrollIntoView({ behavior: "smooth" });
+                    }
+                    // set step ?step=2
+                    if (step === 1) {
+                      router.push("/register?step=2");
+                    }
+                  }
+
+                  if (step === 2 && values.approveCheckbox) {
+                    router.push("/register?step=3");
+                  }
+                  return;
+                }}
+              >
+                {step === 1 ? "SUBMIT" : "ยอมรับ"}
+              </button>
+            </div>
+
+            <div className={`w-full mt-4 ${step === 3 ? "flex" : "hidden"}`}>
+              <button
+                type="submit"
+                className="border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl"
+              >
+                SUBMIT
+              </button>
+            </div>
+
+            {/* modal */}
+            <div className="fixed top-0 left-0 w-full h-full bg-opacity-75 bg-white z-50 justify-center items-center hidden">
+              <div className="p-8 rounded-lg">
+                <p>Loading...</p>
               </div>
             </div>
           </Form>
