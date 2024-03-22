@@ -124,3 +124,16 @@ input:focus {
   overflow: hidden;
   width:280px;
 }
+[type=button], [type=reset], [type=submit], button {
+  -webkit-appearance: button;
+  background-color: inherit
+}
+
+.bg-blue-1 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(20 113 165 / var(--tw-bg-opacity)) !important;
+}
+
+.react-datepicker-wrapper{
+  width: 100%;
+}
