@@ -264,7 +264,7 @@ function Booking() {
     } finally {
       setLoad(false);
     }
-  }, []);
+  }, [router]);
 
   useEffect(() => {
     try {
@@ -282,7 +282,7 @@ function Booking() {
         router.replace("/phVerify");
       });
     }
-  }, [phone]);
+  }, [fetchUserbyPhone, phone, router]);
 
   const handleUpdateData = useCallback(async (user: UserCreateDto) => {
     try {
@@ -324,7 +324,7 @@ function Booking() {
         timer: 1500,
       })
     }
-  }, []);
+  }, [router]);
 
   return (
     <div className="w-full mb-12 px-4 xl:px-8  ">

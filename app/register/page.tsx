@@ -267,7 +267,7 @@ function Register() {
       }
       return false;
     },
-    []
+    [step]
   );
   const handleSubmit = useCallback(async (values: RegisterFormValues) => {
     setIsLoad(true);
@@ -307,7 +307,7 @@ function Register() {
     } finally {
       setIsLoad(false);
     }
-  }, []);
+  }, [router]);
 
   return (
     <div className="w-full mb-12 px-3 xl:px-8">

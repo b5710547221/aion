@@ -235,6 +235,30 @@ function AdminReportPage() {
   const [users, setUsers] = useState<UserCreateDto[]>([]);
   const [isLoad, setIsLoad] = useState<boolean>(false);
 
+  const mapNameToDataColumn = useCallback((name: string) => {
+    switch (name) {
+      case "Name":
+        return "name";
+      case "Email":
+        return "email";
+      case "Phone":
+        return "phone";
+      case "Interest Model":
+        return "interestModel";
+      case "Plan For Car Percharsing":
+        return "planForCarPercharsing";
+      case "Dealer":
+        return "dealer";
+      case "Prefer Date Slot":
+        return "preferDateSlot";
+      case "Prefer Time Slot":
+        return "preferTimeSlot";
+      case "Is Licensed":
+        return "isLicensed";
+      default:
+        return "name";
+    }
+  }, []);
   const handleDownloadExcel = useCallback(
     async (usrs: UserCreateDto[], isAll: boolean = false) => {
       setIsLoad(true);
@@ -364,7 +388,7 @@ function AdminReportPage() {
         search: s,
       });
     },
-    [search]
+    [handleSearch, search]
   );
 
   const handleOnTableSort = useCallback(
@@ -374,14 +398,14 @@ function AdminReportPage() {
       const columnData = mapNameToDataColumn(column.name);
       handleSearch({ ...search, order, orderBy: columnData, offset: 0 });
     },
-    [search]
+    [handleSearch, mapNameToDataColumn, search]
   );
 
   const handlePaginationChange = useCallback(
     (page: number, _totalRows: number) => {
       handleSearch({ ...search, offset: (page - 1) * search.limit });
     },
-    [search]
+    [handleSearch, search]
   );
 
   const handlePaginationPerpageChange = useCallback(
@@ -392,62 +416,12 @@ function AdminReportPage() {
         offset: 0,
       });
     },
-    [search]
+    [handleSearch, search]
   );
-
-  const mapNameToDataColumn = useCallback((name: string) => {
-    switch (name) {
-      case "Name":
-        return "name";
-      case "Email":
-        return "email";
-      case "Phone":
-        return "phone";
-      case "Interest Model":
-        return "interestModel";
-      case "Plan For Car Percharsing":
-        return "planForCarPercharsing";
-      case "Dealer":
-        return "dealer";
-      case "Prefer Date Slot":
-        return "preferDateSlot";
-      case "Prefer Time Slot":
-        return "preferTimeSlot";
-      case "Is Licensed":
-        return "isLicensed";
-      default:
-        return "name";
-    }
-  }, []);
-
-  const mapColumnToName = useCallback((name: string) => {
-    switch (name) {
-      case "name":
-        return "Name";
-      case "email":
-        return "Email";
-      case "phone":
-        return "Phone";
-      case "interestModel":
-        return "Interest Model";
-      case "planForCarPercharsing":
-        return "Plan For Car Percharsing";
-      case "dealer":
-        return "Dealer";
-      case "preferDateSlot":
-        return "Prefer Date Slot";
-      case "preferTimeSlot":
-        return "Prefer Time Slot";
-      case "isLicensed":
-        return "Is Licensed";
-      default:
-        return "Name";
-    }
-  }, []);
 
   useEffect(() => {
     handleSearch();
-  }, []);
+  }, [handleSearch]);
 
   const columns: TableColumn<UserCreateDto>[] = useMemo(
     () => [

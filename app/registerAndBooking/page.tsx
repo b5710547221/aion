@@ -4,7 +4,6 @@ import axios from "axios";
 import { Field, Form, Formik, FormikErrors } from "formik";
 import Image from "next/image";
 import { Suspense, useCallback, useMemo, useState } from "react";
-import DatePicker from "react-datepicker";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { boolean, object, string } from "yup";
@@ -184,7 +183,6 @@ const timeSlot: any[] = [
   },
 ];
 
-import dayjs from "dayjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import "react-datepicker/dist/react-datepicker.css";
 export interface RegisterFormValues {
@@ -194,7 +192,7 @@ export interface RegisterFormValues {
   interestModel: string;
   planForCarPercharsing: string;
   dealer: string;
-  preferDateSlot: string;
+  preferDateSlot: string | null;
   preferTimeSlot: string;
   isLicensed: boolean;
   approveCheckbox?: boolean;
@@ -204,11 +202,13 @@ const yupSchema = object().shape({
   name: string().required("Name is required").min(2),
   email: string(),
   phone: string().required("Phone is required").min(9).max(13),
-  interestModel: string(),
-  planForCarPercharsing: string(),
-  dealer: string(),
-  preferDateSlot: string(),
-  preferTimeSlot: string(),
+  interestModel: string().required("Interest Model is required"),
+  planForCarPercharsing: string().required(
+    "Plan for car percharsing is required"
+  ),
+  dealer: string().required("Dealer is required"),
+  preferDateSlot: string().required("Prefer date slot is required"),
+  preferTimeSlot: string().required("Prefer time slot is required"),
   isLicensed: boolean(),
 });
 
@@ -230,7 +230,11 @@ function Register() {
     return parseInt(newStep as string);
   }, [query]);
   const checkStep1 = useCallback(
-    (errors: FormikErrors<RegisterFormValues>, values: RegisterFormValues) => {
+    (
+      errors: FormikErrors<RegisterFormValues>,
+      values: RegisterFormValues,
+      setErrors: (errors: FormikErrors<RegisterFormValues>) => void
+    ) => {
       if (
         step === 1 &&
         !errors.name &&
@@ -240,13 +244,29 @@ function Register() {
         !errors.planForCarPercharsing &&
         !errors.dealer &&
         values.name !== "" &&
-        values.phone !== ""
+        values.phone !== "" &&
+        values.interestModel !== "" &&
+        values.planForCarPercharsing !== "" &&
+        values.dealer !== ""
       ) {
+        if (values.email !== "") {
+          // validate email
+          const email = values.email;
+          const emailPattern =
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+          if (!emailPattern.test(email)) {
+            setErrors({
+              ...errors,
+              email: "Invalid email",
+            });
+            return false;
+          }
+        }
         return true;
       }
       return false;
     },
-    []
+    [step]
   );
   const handleSubmit = useCallback(async (values: RegisterFormValues) => {
     setIsLoad(true);
@@ -285,7 +305,7 @@ function Register() {
     } finally {
       setIsLoad(false);
     }
-  }, []);
+  }, [router]);
 
   return (
     <div className="w-full mb-12 px-3 xl:px-8 ">
@@ -326,7 +346,7 @@ function Register() {
           interestModel: "",
           planForCarPercharsing: "",
           dealer: "",
-          preferDateSlot: dayjs().format("YYYY-MM-DD"),
+          preferDateSlot: null,
           preferTimeSlot: "",
           isLicensed: true,
           approveCheckbox: undefined,
@@ -336,7 +356,7 @@ function Register() {
         }}
         validationSchema={yupSchema}
       >
-        {({ errors, touched, setFieldValue, values }) => (
+        {({ errors, touched, setFieldValue, values, setErrors }) => (
           <Form>
             <div
               className={`w-full overflow-hidden shadow-lg bg-white border  rounded-lg mt-8 bg-opacity-70 ${
@@ -469,7 +489,7 @@ function Register() {
                     htmlFor="interestModel"
                     className="font-deacon13 label-element absolute text-base left-2 transition-all text-black bg-white px-1"
                   >
-                    Interested Model
+                    Interested Model <span className="text-red">*</span>
                   </label>
                   {errors.interestModel && touched.interestModel && (
                     <small className="text-red">{errors.interestModel}</small>
@@ -511,7 +531,7 @@ function Register() {
                     htmlFor="planForCarPercharsing"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
-                    Plan for car percharsing
+                    Plan for car percharsing <span className="text-red">*</span>
                   </label>
                   {errors.planForCarPercharsing &&
                     touched.planForCarPercharsing && (
@@ -561,7 +581,7 @@ function Register() {
                     htmlFor="model"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
-                    Dealer
+                    Dealer <span className="text-red">*</span>
                   </label>
                   {errors.dealer && touched.dealer && (
                     <small className="text-red">{errors.dealer}</small>
@@ -606,7 +626,7 @@ function Register() {
                     htmlFor="preferDateSlot"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
-                    Prefer date slot
+                    Prefer date slot <span className="text-red">*</span>
                   </label>
                   {errors.preferDateSlot && touched.preferDateSlot && (
                     <small className="text-red">{errors.dealer}</small>
@@ -643,7 +663,7 @@ function Register() {
                     htmlFor="preferTimeSlot"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all bg-white px-1"
                   >
-                    Prefer time slot
+                    Prefer time slot <span className="text-red">*</span>
                   </label>
                   {errors.preferTimeSlot && touched.preferTimeSlot && (
                     <small className="text-red">{errors.preferTimeSlot}</small>
@@ -747,10 +767,12 @@ function Register() {
               <button
                 type="button"
                 className={`border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl ${
-                  checkStep1(errors, values) ? "" : "cursor-not-allowed"
+                  checkStep1(errors, values, setErrors)
+                    ? ""
+                    : "cursor-not-allowed"
                 }`}
                 onClick={() => {
-                  if (checkStep1(errors, values)) {
+                  if (checkStep1(errors, values, setErrors)) {
                     // scroll to error element
                     if (document) {
                       const errorElement =
