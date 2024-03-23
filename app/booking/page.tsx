@@ -233,7 +233,7 @@ function Booking() {
           "Content-Type": "application/json; charset=utf-8",
         },
       });
-      if (response.data && response.data.isSussess) {
+      if (response.data && response.data.isSuccess) {
         if ((response.data?.data?.data ?? []).length > 0) {
           setUser(response.data?.data?.data[0]);
         } else {
@@ -304,7 +304,7 @@ function Booking() {
           isLicensed: user.isLicensed,
         },
       });
-      if (response.data && response.data.isSussess) {
+      if (response.data && response.data.isSuccess) {
         Swal.fire({
           icon: "success",
           title: "Success",

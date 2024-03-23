@@ -259,11 +259,11 @@ function Register() {
         },
         data: { ...values, approveCheckbox: undefined },
       });
-      if (response.data && response?.data?.isSussess) {
+      if (response.data && response?.data?.isSuccess) {
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Register Success",
+          text: "",
           timer: 2000,
           showConfirmButton: false,
         }).then(() => {

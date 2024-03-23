@@ -183,7 +183,6 @@ const timeSlot: any[] = [
   },
 ];
 
-import dayjs from "dayjs";
 import { useRouter, useSearchParams } from "next/navigation";
 import "react-datepicker/dist/react-datepicker.css";
 export interface RegisterFormValues {
@@ -281,7 +280,8 @@ function Register() {
         },
         data: { ...values, approveCheckbox: undefined },
       });
-      if (response.data && response?.data?.isSussess) {
+      console.log(response);
+      if (response.data && response?.data?.isSuccess) {
         Swal.fire({
           icon: "success",
           title: "Success",
