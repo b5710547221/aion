@@ -201,7 +201,7 @@ export interface RegisterFormValues {
 
 const yupSchema = object().shape({
   name: string().required("Name is required").min(2),
-  email: string().email("Invalid email").required("Email is required"),
+  email: string(),
   phone: string().required("Phone is required").min(9).max(13),
   interestModel: string().required("Interest Model is required"),
   planForCarPercharsing: string().required(
@@ -231,7 +231,11 @@ function Register() {
     return parseInt(newStep as string);
   }, [query]);
   const checkStep1 = useCallback(
-    (errors: FormikErrors<RegisterFormValues>, values: RegisterFormValues) => {
+    (
+      errors: FormikErrors<RegisterFormValues>,
+      values: RegisterFormValues,
+      setErrors: (errors: FormikErrors<RegisterFormValues>) => void
+    ) => {
       if (
         step === 1 &&
         !errors.name &&
@@ -242,12 +246,24 @@ function Register() {
         !errors.dealer &&
         values.name !== "" &&
         values.phone !== "" &&
-        values.email !== "" &&
         values.interestModel !== "" &&
         values.planForCarPercharsing !== "" &&
         values.dealer !== "" &&
         values.approveCheckbox
       ) {
+        if (values.email !== "") {
+          // validate email
+          const email = values.email;
+          const emailPattern =
+            /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+          if (!emailPattern.test(email)) {
+            setErrors({
+              ...errors,
+              email: "Invalid email",
+            });
+            return false;
+          }
+        }
         return true;
       }
       return false;
@@ -342,7 +358,14 @@ function Register() {
         }}
         validationSchema={yupSchema}
       >
-        {({ errors, touched, setFieldValue, values, submitForm }) => (
+        {({
+          errors,
+          touched,
+          setFieldValue,
+          values,
+          submitForm,
+          setErrors,
+        }) => (
           <Form>
             <div
               className={`w-full overflow-hidden shadow-lg bg-white border  rounded-lg mt-8 bg-opacity-70 ${
@@ -426,7 +449,7 @@ function Register() {
                     htmlFor="email"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all bg-white px-1"
                   >
-                    E-mail <span className="text-red">*</span>
+                    E-mail
                   </label>
                   {errors.email && touched.email && (
                     <small className="text-red">{errors.email}</small>
@@ -749,10 +772,12 @@ function Register() {
               <button
                 type="button"
                 className={`border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl ${
-                  checkStep1(errors, values) ? "" : "cursor-not-allowed"
+                  checkStep1(errors, values, setErrors)
+                    ? ""
+                    : "cursor-not-allowed"
                 }`}
                 onClick={() => {
-                  if (checkStep1(errors, values)) {
+                  if (checkStep1(errors, values, setErrors)) {
                     // scroll to error element
                     if (document) {
                       const errorElement =
