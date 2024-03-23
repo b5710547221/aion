@@ -4,6 +4,7 @@ import axios from "axios";
 import { Field, Form, Formik, FormikErrors } from "formik";
 import Image from "next/image";
 import { Suspense, useCallback, useMemo, useState } from "react";
+import DatePicker from "react-datepicker";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { boolean, object, string } from "yup";
@@ -193,7 +194,7 @@ export interface RegisterFormValues {
   interestModel: string;
   planForCarPercharsing: string;
   dealer: string;
-  preferDateSlot?: string | null;
+  preferDateSlot: string;
   preferTimeSlot: string;
   isLicensed: boolean;
   approveCheckbox?: boolean;
@@ -201,14 +202,12 @@ export interface RegisterFormValues {
 
 const yupSchema = object().shape({
   name: string().required("Name is required").min(2),
-  email: string().email("Invalid email").required("Email is required"),
+  email: string(),
   phone: string().required("Phone is required").min(9).max(13),
-  interestModel: string().required("Interest Model is required"),
-  planForCarPercharsing: string().required(
-    "Plan for car percharsing is required"
-  ),
-  dealer: string().required("Dealer is required"),
-  preferDateSlot: string().nullable(),
+  interestModel: string(),
+  planForCarPercharsing: string(),
+  dealer: string(),
+  preferDateSlot: string(),
   preferTimeSlot: string(),
   isLicensed: boolean(),
 });
@@ -241,12 +240,7 @@ function Register() {
         !errors.planForCarPercharsing &&
         !errors.dealer &&
         values.name !== "" &&
-        values.phone !== "" &&
-        values.email !== "" &&
-        values.interestModel !== "" &&
-        values.planForCarPercharsing !== "" &&
-        values.dealer !== "" &&
-        values.approveCheckbox
+        values.phone !== ""
       ) {
         return true;
       }
@@ -294,7 +288,7 @@ function Register() {
   }, []);
 
   return (
-    <div className="w-full mb-12 px-3 xl:px-8">
+    <div className="w-full mb-12 px-3 xl:px-8 ">
       <div className="w-full flex justify-center  mt-8">
         <Link href="/">
           <Image alt="test" src={logo_aion} width={350} height={100} />
@@ -332,7 +326,7 @@ function Register() {
           interestModel: "",
           planForCarPercharsing: "",
           dealer: "",
-          preferDateSlot: null,
+          preferDateSlot: dayjs().format("YYYY-MM-DD"),
           preferTimeSlot: "",
           isLicensed: true,
           approveCheckbox: undefined,
@@ -342,7 +336,7 @@ function Register() {
         }}
         validationSchema={yupSchema}
       >
-        {({ errors, touched, setFieldValue, values, submitForm }) => (
+        {({ errors, touched, setFieldValue, values }) => (
           <Form>
             <div
               className={`w-full overflow-hidden shadow-lg bg-white border  rounded-lg mt-8 bg-opacity-70 ${
@@ -426,14 +420,14 @@ function Register() {
                     htmlFor="email"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all bg-white px-1"
                   >
-                    E-mail <span className="text-red">*</span>
+                    E-mail
                   </label>
                   {errors.email && touched.email && (
                     <small className="text-red">{errors.email}</small>
                   )}
                 </div>
 
-                <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-lg">
+                <div className=" relative mt-4 h-12 input-component mb-5 w-full rounded-lg">
                   <div className="relative group ">
                     <Select
                       id="interestModel"
@@ -452,10 +446,10 @@ function Register() {
                         { value: "Y Plus Elite", label: "Y Plus Elite" },
                       ]}
                       isDisabled={step > 1}
-                      className={`w-full text-gray-500 border ${
+                      className={`w-full text-gray-500  ${
                         errors.interestModel && touched.interestModel
-                          ? "border-red"
-                          : "border-black"
+                          ? "border-red border"
+                          : ""
                       } bg-white hover:bg-white focus:ring-4 rounded-lg`}
                       onChange={(e) => {
                         setFieldValue("interestModel", e?.value ?? "");
@@ -475,7 +469,7 @@ function Register() {
                     htmlFor="interestModel"
                     className="font-deacon13 label-element absolute text-base left-2 transition-all text-black bg-white px-1"
                   >
-                    Interested Model <span className="text-red">*</span>
+                    Interested Model
                   </label>
                   {errors.interestModel && touched.interestModel && (
                     <small className="text-red">{errors.interestModel}</small>
@@ -492,11 +486,11 @@ function Register() {
                         { value: "2-3 months", label: "2-3 months" },
                         { value: "3 months+", label: "3 months+" },
                       ]}
-                      className={`w-full text-gray-500 border ${
+                      className={`w-full text-gray-500  ${
                         errors.planForCarPercharsing &&
                         touched.planForCarPercharsing
-                          ? "border-red"
-                          : "border-black"
+                          ? "border-red border"
+                          : ""
                       } bg-white hover:bg-white focus:ring-4 rounded-lg`}
                       onChange={(e) => {
                         setFieldValue("planForCarPercharsing", e?.value ?? 0);
@@ -517,7 +511,7 @@ function Register() {
                     htmlFor="planForCarPercharsing"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
-                    Plan for car percharsing <span className="text-red">*</span>
+                    Plan for car percharsing
                   </label>
                   {errors.planForCarPercharsing &&
                     touched.planForCarPercharsing && (
@@ -527,7 +521,7 @@ function Register() {
                     )}
                 </div>
 
-                <div className=" relative mt-4 h-12 input-component w-full rounded-xl mb-4">
+                <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-xl">
                   <div className="relative group ">
                     <Select
                       id="dealer"
@@ -567,59 +561,11 @@ function Register() {
                     htmlFor="model"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
-                    Dealer <span className="text-red">*</span>
+                    Dealer
                   </label>
                   {errors.dealer && touched.dealer && (
                     <small className="text-red">{errors.dealer}</small>
                   )}
-                </div>
-
-                <div className="flex flex-col justify-center items-center w-full my-2">
-                  <div className="relative w-full px-4 pr-4 border border-black rounded-xl bg-white text-ellipsis overflow-hidden py-4">
-                    <div className="font-deacon13  mb-4 text-black text-lg">
-                      เมื่อผู้ลงทะเบียนกด ยอมรับ
-                      แสดงว่าคุณเข้าใจและตกลงที่จะอนุญาต ให้บริษัทฯ
-                      นำข้อมูลส่วนบุคคลของคุณไปใช้ในการทำสื่อโฆษณาประชาสัมพันธ์ติดตามสถานะและยอมรับการส่งเสริมการขายโปรดตรวจสอบนโยบายความเป็นส่วนตัวของเราโดยละเอียด
-                      ตามลิ้งค์แนบ
-                    </div>
-                    <div
-                      style={{
-                        maxWidth: "100%",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "wrap",
-                      }}
-                    >
-                      <Link
-                        href="https://www.aionauto.com/privacy/agreement"
-                        className="text-blue-2 hover:text-blue-1 w-5/6 text-eclipse"
-                        target="_blank"
-                      >
-                        <small className=" text-underline xl:text-blue1 text-base font-deacon13 text-ellipsis w-full over max-w-fit">
-                          {" "}
-                          https://www.aionauto.com/privacy/agreement
-                        </small>
-                      </Link>
-                    </div>
-                  </div>
-                  <div className=" w-full mt-8">
-                    <label className="ms-2 text-base  text-gray-900 dark:text-gray-300 font-deacon13 items-center flex">
-                      <Field
-                        id="approveCheckbox"
-                        type="checkbox"
-                        value="true"
-                        onChange={() => {
-                          setFieldValue(
-                            "approveCheckbox",
-                            values.approveCheckbox ? false : true
-                          );
-                        }}
-                        checked={values.approveCheckbox}
-                        className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600 mr-2"
-                      />
-                      <span>ยอมรับ</span>
-                    </label>
-                  </div>
                 </div>
               </div>
             </div>
@@ -658,7 +604,7 @@ function Register() {
                   </div>
                   <label
                     htmlFor="preferDateSlot"
-                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
+                    className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
                     Prefer date slot
                   </label>
@@ -695,7 +641,7 @@ function Register() {
                   </div>
                   <label
                     htmlFor="preferTimeSlot"
-                    className="font-deacon13 text-blue1 absolute text-base left-2 transition-all bg-white px-1"
+                    className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all bg-white px-1"
                   >
                     Prefer time slot
                   </label>
@@ -745,6 +691,58 @@ function Register() {
               </div>
             </div>
 
+            <div
+              className={`w-full  overflow-hidden shadow-lg bg-white bg-opacity-60 border  rounded-lg mt-4 ${
+                step === 2 ? "flex" : "hidden"
+              }`}
+            >
+              <div className="flex flex-col gap-8 justify-center items-center w-full my-2 pl-4 pr-4">
+                <div className="relative w-full px-4 pr-4 mt-4 border border-black bg-white rounded-xl py-2 overflow-hidden">
+                  <div className="font-deacon13  mb-4 text-black text-lg">
+                    เมื่อผู้ลงทะเบียนกด ยอมรับ
+                    แสดงว่าคุณเข้าใจและตกลงที่จะอนุญาต ให้บริษัทฯ
+                    นำข้อมูลส่วนบุคคลของคุณไปใช้ในการทำสื่อโฆษณาประชาสัมพันธ์ติดตามสถานะและยอมรับการส่งเสริมการขายโปรดตรวจสอบนโยบายความเป็นส่วนตัวของเราโดยละเอียด
+                    ตามลิ้งค์แนบ
+                  </div>
+                  <div
+                    style={{
+                      maxWidth: "100%",
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      whiteSpace: "wrap",
+                    }}
+                  >
+                    <Link
+                      href="https://www.aionauto.com/privacy/agreement"
+                      className=" text-blue-2 hover:text-blue-1"
+                    >
+                      <small className=" text-underline  text-base font-deacon13">
+                        {" "}
+                        https://www.aionauto.com/privacy/agreement
+                      </small>
+                    </Link>
+                  </div>
+                </div>
+                <div className=" items-center w-full ">
+                  <label className="ms-2 text-base  text-gray-900 dark:text-gray-300 font-deacon13">
+                    <Field
+                      id="approveCheckbox"
+                      type="checkbox"
+                      value="true"
+                      onChange={() => {
+                        setFieldValue(
+                          "approveCheckbox",
+                          values.approveCheckbox ? false : true
+                        );
+                      }}
+                      checked={values.approveCheckbox}
+                      className="w-4 h-4 text-black bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+                    />{" "}
+                    ยอมรับ
+                  </label>
+                </div>
+              </div>
+            </div>
             <div className={`w-full mt-4 ${step < 3 ? "flex" : "hidden"}`}>
               <button
                 type="button"
@@ -759,12 +757,14 @@ function Register() {
                         document.querySelector(".border-red");
                       errorElement?.scrollIntoView({ behavior: "smooth" });
                     }
-                    submitForm();
-                    return;
+                    // set step ?step=2
+                    if (step === 1) {
+                      router.push("/registerAndBooking?step=2");
+                    }
                   }
 
                   if (step === 2 && values.approveCheckbox) {
-                    router.push("/register?step=3");
+                    router.push("/registerAndBooking?step=3");
                   }
                   return;
                 }}
@@ -772,6 +772,7 @@ function Register() {
                 {step === 1 ? "SUBMIT" : "ยอมรับ"}
               </button>
             </div>
+
             <div className={`w-full mt-4 ${step === 3 ? "flex" : "hidden"}`}>
               <button
                 type="submit"

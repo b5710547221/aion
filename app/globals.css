@@ -10,30 +10,28 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-   /*  --foreground-rgb: 255, 255, 255; */
-   /*  --background-start-rgb: 0, 0, 0;
+    /*  --foreground-rgb: 255, 255, 255; */
+    /*  --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0; */
   }
 }
 
 body {
- /*  color: rgb(var(--foreground-rgb));
+  /*  color: rgb(var(--foreground-rgb));
   background: linear-gradient(
       to bottom,
       transparent,
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb)); */
-    background-image:  url('./../assets/images/bg3.png');
-    background-attachment: fixed;
-    background-size:  cover;    
-    width: 100%;
-    height: 100%;
-    background-repeat: no-repeat;
-    background-position: center center;
-    scroll-behavior: smooth;
-  
-
+  background-image: url("./../assets/images/bg3.png");
+  background-attachment: fixed;
+  background-size: cover;
+  width: 100%;
+  height: 100%;
+  background-repeat: no-repeat;
+  background-position: center center;
+  scroll-behavior: smooth;
 }
 label {
   top: 0%;
@@ -62,71 +60,88 @@ input:focus {
   }
 }
 @font-face {
-  font-family: 'AIONType-regular';
-  src: local('AIONType-regular'), url("../public/fonts/AIONType-regular.otf") format('opentype');
+  font-family: "AIONType-regular";
+  src: local("AIONType-regular"),
+    url("../public/fonts/AIONType-regular.otf") format("opentype");
 }
 @font-face {
-  font-family: 'AIONType-regular-italic';
-  src: local('AIONType-regular-italic'), url("../public/fonts/AIONType-regular-italic.otf") format('opentype');
+  font-family: "AIONType-regular-italic";
+  src: local("AIONType-regular-italic"),
+    url("../public/fonts/AIONType-regular-italic.otf") format("opentype");
 }
 @font-face {
-  font-family: 'AIONType-light';
-  src: local('AIONType-light'), url("../public/fonts/AIONType-light.otf") format('opentype');
+  font-family: "AIONType-light";
+  src: local("AIONType-light"),
+    url("../public/fonts/AIONType-light.otf") format("opentype");
 }
 @font-face {
-  font-family: 'AIONType-light-italic';
-  src: local('AIONType-light-italic'), url("../public/fonts/AIONType-light-italic.otf") format('opentype');
+  font-family: "AIONType-light-italic";
+  src: local("AIONType-light-italic"),
+    url("../public/fonts/AIONType-light-italic.otf") format("opentype");
 }
 @font-face {
-  font-family: 'AIONType-bold';
-  src: local('AIONType-bold'), url("../public/fonts/AIONType-bold.otf") format('opentype');
+  font-family: "AIONType-bold";
+  src: local("AIONType-bold"),
+    url("../public/fonts/AIONType-bold.otf") format("opentype");
 }
 @font-face {
-  font-family: 'AIONType-bold-italic';
-  src: local('AIONType-bold-italic'), url("../public/fonts/AIONType-bold-italic.otf") format('opentype');
+  font-family: "AIONType-bold-italic";
+  src: local("AIONType-bold-italic"),
+    url("../public/fonts/AIONType-bold-italic.otf") format("opentype");
 }
 @font-face {
-  font-family: 'Prompt-BlackItalic';
-  src: local('Prompt-BlackItalic'), url("../public/fonts/Prompt-BlackItalic.ttf") format('opentype');
+  font-family: "Prompt-BlackItalic";
+  src: local("Prompt-BlackItalic"),
+    url("../public/fonts/Prompt-BlackItalic.ttf") format("opentype");
 }
 @font-face {
-  font-family: 'Prompt-Bold';
-  src: local('Prompt-Bold'), url("../public/fonts/Prompt-Bold.ttf") format('opentype');
+  font-family: "Prompt-Bold";
+  src: local("Prompt-Bold"),
+    url("../public/fonts/Prompt-Bold.ttf") format("opentype");
 }
 @font-face {
-  font-family: 'Prompt-BoldItalic';
-  src: local('Prompt-BoldItalic'), url("../public/fonts/Prompt-BoldItalic.ttf") format('opentype');
+  font-family: "Prompt-BoldItalic";
+  src: local("Prompt-BoldItalic"),
+    url("../public/fonts/Prompt-BoldItalic.ttf") format("opentype");
 }
 @font-face {
-  font-family: 'Prompt-ExtraBold';
-  src: local('Prompt-ExtraBold'), url("../public/fonts/Prompt-ExtraBold.ttf") format('opentype');
+  font-family: "Prompt-ExtraBold";
+  src: local("Prompt-ExtraBold"),
+    url("../public/fonts/Prompt-ExtraBold.ttf") format("opentype");
 }
 @font-face {
-  font-family: 'Prompt-ExtraBoldItalic';
-  src: local('Prompt-ExtraBoldItalic'), url("../public/fonts/Prompt-ExtraBoldItalic.ttf") format('opentype');
+  font-family: "Prompt-ExtraBoldItalic";
+  src: local("Prompt-ExtraBoldItalic"),
+    url("../public/fonts/Prompt-ExtraBoldItalic.ttf") format("opentype");
 }
 @font-face {
-  font-family: 'Prompt-Italic';
-  src: local('Prompt-Italic'), url("../public/fonts/Prompt-Italic.ttf") format('opentype');
+  font-family: "Prompt-Italic";
+  src: local("Prompt-Italic"),
+    url("../public/fonts/Prompt-Italic.ttf") format("opentype");
 }
 @font-face {
-  font-family: 'Prompt-Regular';
-  src: local('Prompt-Regular'), url("../public/fonts/Prompt-Regular.ttf") format('opentype');
+  font-family: "Prompt-Regular";
+  src: local("Prompt-Regular"),
+    url("../public/fonts/Prompt-Regular.ttf") format("opentype");
 }
 @font-face {
-  font-family: 'Prompt-SemiBold';
-  src: local('Prompt-SemiBold'), url("../public/fonts/Prompt-SemiBold.ttf") format('opentype');
+  font-family: "Prompt-SemiBold";
+  src: local("Prompt-SemiBold"),
+    url("../public/fonts/Prompt-SemiBold.ttf") format("opentype");
 }
 
-#link1{
+#link1 {
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
-  width:280px;
+  width: 280px;
 }
-[type=button], [type=reset], [type=submit], button {
+[type="button"],
+[type="reset"],
+[type="submit"],
+button {
   -webkit-appearance: button;
-  background-color: inherit
+  background-color: inherit;
 }
 
 .bg-blue-1 {
@@ -134,10 +149,15 @@ input:focus {
   background-color: rgb(20 113 165 / var(--tw-bg-opacity)) !important;
 }
 
-.react-datepicker-wrapper{
+.react-datepicker-wrapper {
   width: 100%;
 }
 
-.cursor-not-allowed{
-  opacity: .7;
+.cursor-not-allowed {
+  opacity: 0.7;
+}
+
+.label-element {
+  background-color: transparent;
+  background-image: linear-gradient(180deg, rgba(255,255,255,0) 49%, rgba(255,255,255,1) 47%);
 }

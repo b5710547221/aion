@@ -7,6 +7,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import logo_aion from "./../../assets/images/aion_logo.png";
+import Link from "next/link";
 
 interface UserCreateDto {
   id?: number;
@@ -16,8 +17,8 @@ interface UserCreateDto {
   interestModel?: string;
   planForCarPercharsing?: string;
   dealer?: string;
-  preferDateSlot?: Date;
-  preferTimeSlot?: string;
+  preferDateSlot?: Date | null;
+  preferTimeSlot?: string | null;
   isLicensed?: boolean;
 }
 
@@ -216,7 +217,7 @@ function Booking() {
     interestModel: "",
     planForCarPercharsing: "",
     dealer: "",
-    preferDateSlot: dayjs().toDate(),
+    preferDateSlot: null,
     preferTimeSlot: "",
     isLicensed: false,
   });
@@ -239,12 +240,14 @@ function Booking() {
           Swal.fire({
             icon: "error",
             title: "Oops...",
-            text: "User not found!",
+            text: "หมายเลขนี้ยังไม่มีข้อมูลในระบบ กรุณาลงทะเบียน",
             showConfirmButton: false,
             timer: 1500,
           }).then(() => {
-            router.replace("/phVerify");
+            router.replace("/registerAndBooking");
+            return;
           });
+          return;
         }
       }
     } catch (error) {
@@ -257,6 +260,7 @@ function Booking() {
       }).then(() => {
         router.replace("/phVerify");
       });
+      return;
     } finally {
       setLoad(false);
     }
@@ -286,7 +290,7 @@ function Booking() {
       if (!user.id) throw new Error("User id not found");
       if (!user.preferDateSlot) throw new Error("Prefer date slot not found");
       if (!user.preferTimeSlot) throw new Error("Prefer time slot not found");
-      if (!user.isLicensed) throw new Error("Is licensed not found");
+
       const response = await axios({
         method: "PUT",
         url: "https://aion-api.showkhun.com/user/" + user.id,
@@ -295,7 +299,7 @@ function Booking() {
           "Content-Type": "application/json; charset=utf-8",
         },
         data: {
-          preferDateSlot: user.preferDateSlot,
+          preferDateSlot: dayjs(user.preferDateSlot).format("YYYY-MM-DD"),
           preferTimeSlot: user.preferTimeSlot,
           isLicensed: user.isLicensed,
         },
@@ -304,11 +308,11 @@ function Booking() {
         Swal.fire({
           icon: "success",
           title: "Success",
-          text: "Update user data success!",
+          text: "",
           showConfirmButton: false,
           timer: 1500,
         }).then(() => {
-          router.replace("/phVerify");
+          router.replace("/thankYou");
         });
       }
     } catch (error) {
@@ -318,14 +322,12 @@ function Booking() {
         text: (error as Error).message,
         showConfirmButton: false,
         timer: 1500,
-      }).then(() => {
-        router.replace("/phVerify");
-      });
+      })
     }
   }, []);
 
   return (
-    <div className="w-full mb-12 pl-8 pr-8  ">
+    <div className="w-full mb-12 px-4 xl:px-8  ">
       {/* fullscreen loading */}
       <div
         className={`fixed top-0 left-0 z-50 w-full h-full bg-white bg-opacity-60 items-center justify-center ${
@@ -336,7 +338,9 @@ function Booking() {
       </div>
 
       <div className="w-full flex justify-center  mt-8">
-        <Image alt="test" src={logo_aion} width={350} height={100} />
+        <Link href="/">
+          <Image alt="test" src={logo_aion} width={350} height={100} />
+        </Link>
       </div>
       <div className="w-full text-center  mt-8">
         {/*   <Image  alt="test" src={text2} width={350} height={100}/> */}
@@ -360,7 +364,7 @@ function Booking() {
       <div className="w-full   bg-cream  overflow-hidden shadow-lg bg-blue-20 bg-opacity-60 border  rounded-2xl mt-8">
         <div className="flex flex-col gap-4 justify-center items-center w-full h-fit  pl-4 pr-4">
           <p className="text-left w-full pt-4 font-deacon13">
-            Mr : {user.name}
+            คุณ : {user.name}
           </p>
           <div className="w-full h-27 ">
             <a
@@ -432,7 +436,7 @@ function Booking() {
         </div>
       </div>
 
-      <div className="w-full   bg-cream shadow-lg border  rounded-2xl mt-8">
+      <div className="w-full   bg-cream shadow-lg border  rounded-2xl mt-8 py-4">
         <div className="flex flex-col gap-4 justify-center items-center w-full h-fit  pl-4 pr-4">
           <div className=" relative   mt-4 h-12 input-component mb-5 w-full rounded-xl">
             <div className="relative group ">
@@ -589,11 +593,9 @@ function Booking() {
           type="button"
           className={`border border-white border-l w-full h-12  bg-blue-1  text-white font-bold  mt-2 mb-2   py-2 px-4 rounded-xl`}
           onClick={() => {
-            if (user.isLicensed) {
-              handleUpdateData(user);
-            }
+            handleUpdateData(user);
           }}
-          disabled={!user.isLicensed}
+          disabled={!user.preferDateSlot || !user.preferTimeSlot || user.preferTimeSlot === ""}
         >
           SUBMIT
         </button>
