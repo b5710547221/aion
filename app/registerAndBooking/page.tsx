@@ -1,9 +1,9 @@
 "use client";
 import Link from "@/node_modules/next/link";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import { Field, Form, Formik, FormikErrors } from "formik";
 import Image from "next/image";
-import { Suspense, useCallback, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import Select from "react-select";
 import Swal from "sweetalert2";
 import { boolean, object, string } from "yup";
@@ -183,8 +183,23 @@ const timeSlot: any[] = [
   },
 ];
 
+interface SlotCountResponse {
+  data: SlotCount[];
+  isSuccess: boolean;
+}
+
+interface SlotCount {
+  id: number;
+  preferDateSlot: string;
+  preferTimeSlot: string;
+  count: number;
+  createdAt: string;
+  updatedAt: string;
+}
+
 import { useRouter, useSearchParams } from "next/navigation";
 import "react-datepicker/dist/react-datepicker.css";
+import dayjs from "dayjs";
 export interface RegisterFormValues {
   name: string;
   email: string;
@@ -212,10 +227,15 @@ const yupSchema = object().shape({
   isLicensed: boolean(),
 });
 
+const countLimit = 1;
+
 function Register() {
   const [isLoad, setIsLoad] = useState(false);
   const router = useRouter();
   const query = useSearchParams();
+  const [dateSlotOptions, setDateSlotOptions] = useState<any[]>([...dateSlot]);
+  const [timeSlotOptions, setTimeSlotOptions] = useState<any[]>([...timeSlot]);
+  const [disableList, setDisableList] = useState<SlotCount[]>([]);
   // step by query param step
   const step = useMemo(() => {
     // get step from query
@@ -268,44 +288,109 @@ function Register() {
     },
     [step]
   );
-  const handleSubmit = useCallback(async (values: RegisterFormValues) => {
-    setIsLoad(true);
+  const fetchUserSlotCount = useCallback(async () => {
     try {
-      const response = await axios({
-        method: "POST",
-        url: "https://aion-api.showkhun.com/user",
+      const response: AxiosResponse<SlotCountResponse> = await axios({
+        method: "GET",
+        url:
+          "https://aion-api.showkhun.com/userSlotCount?countLimit=" +
+          countLimit,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
         },
-        data: { ...values, approveCheckbox: undefined },
       });
       if (response.data && response?.data?.isSuccess) {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "",
-          timer: 2000,
-          showConfirmButton: false,
-        }).then(() => {
-          router.replace("/thankYou");
+        setDisableList(response.data.data);
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+  const handleSubmit = useCallback(
+    async (values: RegisterFormValues) => {
+      setIsLoad(true);
+      try {
+        const response = await axios({
+          method: "POST",
+          url: "https://aion-api.showkhun.com/user",
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          },
+          data: { ...values, approveCheckbox: undefined },
         });
-      } else {
+        if (response.data && response?.data?.isSuccess) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "",
+            timer: 2000,
+            showConfirmButton: false,
+          }).then(() => {
+            router.replace("/thankYou");
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Register Fail",
+          });
+        }
+      } catch (error) {
         Swal.fire({
           icon: "error",
           title: "Error",
           text: "Register Fail",
         });
+      } finally {
+        setIsLoad(false);
       }
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Register Fail",
+    },
+    [router]
+  );
+
+  const handleOnDateSlotChange = useCallback(
+    (ds: string) => {
+      const slotInDate = disableList.filter((item) => {
+        return item.preferDateSlot === ds;
       });
-    } finally {
-      setIsLoad(false);
-    }
-  }, [router]);
+      setTimeSlotOptions((prev) => {
+        return prev.map((item) => {
+          const slot = slotInDate.find((s) => s.preferTimeSlot === item.value);
+          if (slot) {
+            return {
+              ...item,
+              isDisabled: slot.count >= countLimit,
+            };
+          }
+          return item;
+        });
+      });
+    },
+    [disableList]
+  );
+
+  const handleDisableDateOption = useCallback(() => {
+    setDateSlotOptions((prev) => {
+      return prev.map((item) => {
+        if (item.value) {
+          const date = dayjs(item.value).startOf("day");
+          const today = dayjs().startOf("day");
+          if (date.isBefore(today)) {
+            return {
+              ...item,
+              isDisabled: true,
+            };
+          }
+        }
+        return item;
+      });
+    });
+  }, []);
+
+  useEffect(() => {
+    handleDisableDateOption();
+    fetchUserSlotCount();
+  }, [fetchUserSlotCount, handleDisableDateOption]);
 
   return (
     <div className="w-full mb-12 px-3 xl:px-8 ">
@@ -602,13 +687,14 @@ function Register() {
                       id="preferDateSlot"
                       inputId="preferDateSlot"
                       menuPlacement="top"
-                      options={dateSlot}
+                      options={dateSlotOptions}
                       className={`w-full text-gray-500  ${
                         errors.preferTimeSlot && touched.preferTimeSlot
                           ? "border-red border"
                           : ""
-                      } bg-white hover:bg-white focus:ring-4 rounded-lg`}
+                      } bg-white hover:bg-white focus:ring-2 rounded-lg`}
                       onChange={(e) => {
+                        handleOnDateSlotChange(e?.value ?? "");
                         setFieldValue("preferDateSlot", e?.value ?? "");
                       }}
                       styles={{
@@ -619,6 +705,13 @@ function Register() {
                           borderRadius: "0.5rem",
                           height: "3.5rem",
                         }),
+                        // not allow isDisabled option
+                        option: (styles, { isDisabled }) => {
+                          return {
+                            ...styles,
+                            cursor: isDisabled ? "not-allowed" : "default",
+                          };
+                        },
                       }}
                     />
                   </div>
@@ -639,12 +732,13 @@ function Register() {
                       id="preferTimeSlot"
                       inputId="preferTimeSlot"
                       menuPlacement="top"
-                      options={timeSlot}
+                      options={timeSlotOptions}
+                      isDisabled={values.preferDateSlot === null}
                       className={`w-full text-gray-500  ${
                         errors.preferTimeSlot && touched.preferTimeSlot
                           ? "border-red border"
                           : ""
-                      } bg-white hover:bg-white focus:ring-4 rounded-lg`}
+                      } bg-white hover:bg-white focus:ring-2 rounded-lg`}
                       onChange={(e) => {
                         setFieldValue("preferTimeSlot", e?.value ?? "");
                       }}
@@ -656,6 +750,13 @@ function Register() {
                           borderRadius: "0.5rem",
                           height: "3.5rem",
                         }),
+                        // not allow isDisabled option
+                        option: (styles, { isDisabled }) => {
+                          return {
+                            ...styles,
+                            cursor: isDisabled ? "not-allowed" : "default",
+                          };
+                        },
                       }}
                     />
                   </div>

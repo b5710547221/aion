@@ -220,6 +220,7 @@ interface UserCreateDto {
   preferTimeSlot?: string | null;
   isLicensed?: boolean;
   updatedAt?: string;
+  createdAt?: string;
 }
 interface APIResponse {
   isSuccess: boolean;
@@ -271,6 +272,8 @@ function AdminReportPage() {
         return "isLicensed";
       case "Updated At":
         return "updatedAt";
+      case "createdAt":
+        return "createdAt";
       default:
         return "name";
     }
@@ -331,7 +334,7 @@ function AdminReportPage() {
       } else {
         dats = usrs;
       }
-      if(dats.length === 0) {
+      if (dats.length === 0) {
         Swal.fire({
           icon: "warning",
           title: "ไม่พบข้อมูล",
@@ -361,6 +364,9 @@ function AdminReportPage() {
                 : "-",
               "Prefer Time Slot": item.preferTimeSlot ?? "-",
               "Is Licensed": isLC,
+              "Created At": item.createdAt
+                ? dayjs(item.createdAt).format("DD/MM/BBBB HH:mm")
+                : "-",
               "Updated At": item.updatedAt
                 ? dayjs(item.updatedAt).format("DD/MM/BBBB HH:mm")
                 : "-",
@@ -378,6 +384,7 @@ function AdminReportPage() {
           { wpx: 100 },
           { wpx: 100 },
           { wpx: 100 },
+          { wpx: 150 },
           { wpx: 150 },
         ];
         // set column header style and filter data
@@ -542,6 +549,7 @@ function AdminReportPage() {
           return <HilightedText needle={search.search} haystack={row.phone} />;
         },
         sortable: true,
+        width: "120px",
       },
       {
         name: "Interest Model",
@@ -559,6 +567,7 @@ function AdminReportPage() {
             ? row.planForCarPercharsing
             : "-",
         sortable: true,
+        center: true,
       },
       {
         name: "Dealer",
@@ -567,25 +576,27 @@ function AdminReportPage() {
         width: "170px",
       },
       {
-        name: "Prefer Date Slot",
+        name: "Date Slot",
         selector: (row) =>
           row?.preferDateSlot ? dayjs(row.preferDateSlot).unix() : 0,
         // custom render
         cell: (row) =>
           row.preferDateSlot
-            ? dayjs(row.preferDateSlot).locale("th").format("DD MMMM BBBB")
+            ? dayjs(row.preferDateSlot).locale("th").format("DD MMM BBBB")
             : "-",
         sortable: true,
         center: true,
+        width: "120px",
       },
       {
-        name: "Prefer Time Slot",
+        name: "Time Slot",
         selector: (row) =>
           row.preferTimeSlot && row.preferTimeSlot !== ""
             ? row.preferTimeSlot
             : "-",
         sortable: false,
         center: true,
+        width: "100px",
       },
       {
         name: "Is Licensed",
@@ -596,6 +607,18 @@ function AdminReportPage() {
           return "-";
         },
         center: true,
+        width: "100px",
+      },
+      {
+        name: "Created At",
+        selector: (row) => (row.createdAt ? dayjs(row.createdAt).unix() : 0),
+        cell: (row) =>
+          row.createdAt
+            ? dayjs(row.createdAt).locale("th").format("DD MMMM BBBB HH:mm")
+            : "-",
+        sortable: true,
+        center: true,
+        width: "170px",
       },
       {
         name: "Updated At",
@@ -606,7 +629,7 @@ function AdminReportPage() {
             : "-",
         sortable: true,
         center: true,
-        width: "180px",
+        width: "170px",
       },
     ],
     [search.search]

@@ -1,8 +1,6 @@
 import Link from "@/node_modules/next/link";
-import { url } from "inspector";
 import Image from "next/image";
 import logo_aion from './../assets/images/aion_logo.png';
-import text1 from './../assets/images/text.png';
 
 export default function Home() {
   return (
