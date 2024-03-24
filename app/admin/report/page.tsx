@@ -275,7 +275,7 @@ function AdminReportPage() {
         return "updatedAt";
       case "Booking At":
         return "bookingAt";
-      case "createdAt":
+      case "Created At":
         return "createdAt";
       default:
         return "name";
