@@ -373,6 +373,9 @@ function AdminReportPage() {
               "Booking At": item.bookingAt
                 ? dayjs(item.bookingAt).format("DD/MM/BBBB HH:mm")
                 : "-",
+              "Updated At": item.updatedAt
+                ? dayjs(item.updatedAt).format("DD/MM/BBBB HH:mm")
+                : "-",
             };
           })
         );
@@ -387,6 +390,7 @@ function AdminReportPage() {
           { wpx: 100 },
           { wpx: 100 },
           { wpx: 100 },
+          { wpx: 150 },
           { wpx: 150 },
           { wpx: 150 },
         ];
@@ -629,6 +633,17 @@ function AdminReportPage() {
         cell: (row) =>
           row.bookingAt
             ? dayjs(row.bookingAt).locale("th").format("DD MMMM BBBB HH:mm")
+            : "-",
+        sortable: true,
+        center: true,
+        width: "170px",
+      },
+      {
+        name: "Updated At",
+        selector: (row) => (row.updatedAt ? dayjs(row.updatedAt).unix() : 0),
+        cell: (row) =>
+          row.updatedAt
+            ? dayjs(row.updatedAt).locale("th").format("DD MMMM BBBB HH:mm")
             : "-",
         sortable: true,
         center: true,
