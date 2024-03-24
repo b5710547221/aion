@@ -185,6 +185,9 @@ const timeSlot: any[] = [
 
 import { useRouter, useSearchParams } from "next/navigation";
 import "react-datepicker/dist/react-datepicker.css";
+
+const API = "https://aion-api.showkhun.com";
+// const API = "http://localhost:4000";
 export interface RegisterFormValues {
   name: string;
   email: string;
@@ -269,45 +272,47 @@ function Register() {
     },
     [step]
   );
-  const handleSubmit = useCallback(async (values: RegisterFormValues) => {
-    setIsLoad(true);
-    try {
-      const response = await axios({
-        method: "POST",
-        url: "https://aion-api.showkhun.com/user",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
-        data: { ...values, approveCheckbox: undefined },
-      });
-      console.log(response);
-      if (response.data && response?.data?.isSuccess) {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "Register Success",
-          timer: 2000,
-          showConfirmButton: false,
-        }).then(() => {
-          router.replace("/thankYou");
+  const handleSubmit = useCallback(
+    async (values: RegisterFormValues) => {
+      setIsLoad(true);
+      try {
+        const response = await axios({
+          method: "POST",
+          url: API + "/user",
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          },
+          data: { ...values, approveCheckbox: undefined },
         });
-      } else {
+        if (response.data && response?.data?.isSuccess) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "Register Success",
+            timer: 2000,
+            showConfirmButton: false,
+          }).then(() => {
+            router.replace("/thankYou");
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Error",
+            text: "Register Fail",
+          });
+        }
+      } catch (error) {
         Swal.fire({
           icon: "error",
           title: "Error",
           text: "Register Fail",
         });
+      } finally {
+        setIsLoad(false);
       }
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Error",
-        text: "Register Fail",
-      });
-    } finally {
-      setIsLoad(false);
-    }
-  }, [router]);
+    },
+    [router]
+  );
 
   return (
     <div className="w-full mb-12 px-3 xl:px-8">
