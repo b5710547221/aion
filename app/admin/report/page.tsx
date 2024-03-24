@@ -221,6 +221,7 @@ interface UserCreateDto {
   isLicensed?: boolean;
   updatedAt?: string;
   createdAt?: string;
+  bookingAt?: string;
 }
 interface APIResponse {
   isSuccess: boolean;
@@ -272,6 +273,8 @@ function AdminReportPage() {
         return "isLicensed";
       case "Updated At":
         return "updatedAt";
+      case "Booking At":
+        return "bookingAt";
       case "createdAt":
         return "createdAt";
       default:
@@ -367,8 +370,8 @@ function AdminReportPage() {
               "Created At": item.createdAt
                 ? dayjs(item.createdAt).format("DD/MM/BBBB HH:mm")
                 : "-",
-              "Updated At": item.updatedAt
-                ? dayjs(item.updatedAt).format("DD/MM/BBBB HH:mm")
+              "Booking At": item.bookingAt
+                ? dayjs(item.bookingAt).format("DD/MM/BBBB HH:mm")
                 : "-",
             };
           })
@@ -621,11 +624,11 @@ function AdminReportPage() {
         width: "170px",
       },
       {
-        name: "Updated At",
-        selector: (row) => (row.updatedAt ? dayjs(row.updatedAt).unix() : 0),
+        name: "Booking At",
+        selector: (row) => (row.bookingAt ? dayjs(row.bookingAt).unix() : 0),
         cell: (row) =>
-          row.updatedAt
-            ? dayjs(row.updatedAt).locale("th").format("DD MMMM BBBB HH:mm")
+          row.bookingAt
+            ? dayjs(row.bookingAt).locale("th").format("DD MMMM BBBB HH:mm")
             : "-",
         sortable: true,
         center: true,
