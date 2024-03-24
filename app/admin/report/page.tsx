@@ -271,11 +271,11 @@ function AdminReportPage() {
         return "preferTimeSlot";
       case "Is Licensed":
         return "isLicensed";
-      case "Updated At":
+      case "Update Time ":
         return "updatedAt";
-      case "Booking At":
+      case "Booking Time":
         return "bookingAt";
-      case "Created At":
+      case "Register Time":
         return "createdAt";
       default:
         return "name";
@@ -367,13 +367,13 @@ function AdminReportPage() {
                 : "-",
               "Prefer Time Slot": item.preferTimeSlot ?? "-",
               "Is Licensed": isLC,
-              "Created At": item.createdAt
+              "Register Time": item.createdAt
                 ? dayjs(item.createdAt).format("DD/MM/BBBB HH:mm")
                 : "-",
-              "Booking At": item.bookingAt
+              "Booking Time": item.bookingAt
                 ? dayjs(item.bookingAt).format("DD/MM/BBBB HH:mm")
                 : "-",
-              "Updated At": item.updatedAt
+              "Update Time ": item.updatedAt
                 ? dayjs(item.updatedAt).format("DD/MM/BBBB HH:mm")
                 : "-",
             };
@@ -617,7 +617,7 @@ function AdminReportPage() {
         width: "100px",
       },
       {
-        name: "Created At",
+        name: "Register Time",
         selector: (row) => (row.createdAt ? dayjs(row.createdAt).unix() : 0),
         cell: (row) =>
           row.createdAt
@@ -628,7 +628,7 @@ function AdminReportPage() {
         width: "170px",
       },
       {
-        name: "Booking At",
+        name: "Booking Time",
         selector: (row) => (row.bookingAt ? dayjs(row.bookingAt).unix() : 0),
         cell: (row) =>
           row.bookingAt
@@ -639,7 +639,7 @@ function AdminReportPage() {
         width: "170px",
       },
       {
-        name: "Updated At",
+        name: "Update Time ",
         selector: (row) => (row.updatedAt ? dayjs(row.updatedAt).unix() : 0),
         cell: (row) =>
           row.updatedAt
@@ -894,7 +894,7 @@ function AdminReportPage() {
                 : "-"}
             </p>
             <p>
-              Updated At:{" "}
+              Update Time :{" "}
               {selectedUser?.updatedAt
                 ? dayjs(selectedUser?.updatedAt)
                     .locale("th")
