@@ -10,6 +10,16 @@ import Select from "react-select";
 import logo_aion from "./../../../assets/images/aion_logo.png";
 import XLSX from "sheetjs-style";
 import Swal from "sweetalert2";
+import timezone from "dayjs/plugin/timezone";
+import buddhistEra from "dayjs/plugin/buddhistEra";
+import "dayjs/locale/th";
+
+dayjs.extend(timezone);
+dayjs.extend(buddhistEra);
+
+// default timezone
+dayjs.tz.setDefault("Asia/Bangkok");
+
 // cancelToken
 let source = axios.CancelToken.source();
 
@@ -209,6 +219,7 @@ interface UserCreateDto {
   preferDateSlot?: Date | null;
   preferTimeSlot?: string | null;
   isLicensed?: boolean;
+  updatedAt?: string;
 }
 interface APIResponse {
   isSuccess: boolean;
@@ -232,6 +243,9 @@ function AdminReportPage() {
     orderBy: "id",
   });
 
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [selectedUser, setSelectedUser] = useState<UserCreateDto | null>(null);
+
   const [users, setUsers] = useState<UserCreateDto[]>([]);
   const [isLoad, setIsLoad] = useState<boolean>(false);
 
@@ -245,7 +259,7 @@ function AdminReportPage() {
         return "phone";
       case "Interest Model":
         return "interestModel";
-      case "Plan For Car Percharsing":
+      case "Plan For Car Purchasing":
         return "planForCarPercharsing";
       case "Dealer":
         return "dealer";
@@ -255,36 +269,103 @@ function AdminReportPage() {
         return "preferTimeSlot";
       case "Is Licensed":
         return "isLicensed";
+      case "Updated At":
+        return "updatedAt";
       default:
         return "name";
     }
   }, []);
+
+  const handleSelectRow = useCallback((row: UserCreateDto) => {
+    setSelectedUser(row);
+    setShowModal(true);
+  }, []);
+
+  const fetchAllData = useCallback(async () => {
+    if (search.totalRows === 0) return [];
+    // loop fetch data by search
+    const datas: UserCreateDto[] = [];
+    try {
+      const totalRows = search.totalRows;
+      let currentPages = 0;
+      const limit = search.limit;
+
+      // loop fetch data by search
+      while (currentPages < totalRows) {
+        const response: AxiosResponse<APIResponse, any> = await axios({
+          method: "GET",
+          url: "https://aion-api.showkhun.com/user",
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          },
+          params: {
+            search: search.search,
+            preferDateSlot: search.preferDateSlot,
+            preferTimeSlot: search.preferTimeSlot,
+            offset: currentPages,
+            limit: limit,
+            order: search.order,
+            orderBy: search.orderBy,
+          },
+          cancelToken: source.token,
+        });
+        if (response.data.isSuccess) {
+          datas.push(...response.data.data.data);
+          currentPages += limit;
+        }
+      }
+
+      return datas;
+    } catch (error) {
+      return [];
+    }
+  }, [search]);
+
   const handleDownloadExcel = useCallback(
     async (usrs: UserCreateDto[], isAll: boolean = false) => {
       setIsLoad(true);
       let dats: UserCreateDto[] = [];
       if (isAll) {
         // fetch all data by search
+        dats = await fetchAllData();
       } else {
         dats = usrs;
+      }
+      if(dats.length === 0) {
+        Swal.fire({
+          icon: "warning",
+          title: "ไม่พบข้อมูล",
+          text: "ไม่พบข้อมูลที่ต้องการดาวน์โหลด",
+        });
+        setIsLoad(false);
+        return;
       }
       try {
         // create a new workbook with filter header and remap column name
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(
-          dats.map((item) => ({
-            Name: item.name,
-            Email: item.email,
-            Phone: item.phone,
-            "Interest Model": item.interestModel,
-            "Plan For Car Percharsing": item.planForCarPercharsing,
-            Dealer: item.dealer,
-            "Prefer Date Slot": item.preferDateSlot
-              ? dayjs(item.preferDateSlot).format("DD/MM/YYYY")
-              : "-",
-            "Prefer Time Slot": item.preferTimeSlot ?? "-",
-            "Is Licensed": item.isLicensed ? "Yes" : "No",
-          }))
+          dats.map((item) => {
+            let isLC = "-";
+            if (item.preferTimeSlot !== null && item.preferTimeSlot !== "") {
+              isLC = item.isLicensed ? "Yes" : "No";
+            }
+            return {
+              Name: item.name,
+              Email: item.email,
+              Phone: item.phone,
+              "Interest Model": item.interestModel,
+              "Plan For Car Purchasing": item.planForCarPercharsing,
+              Dealer: item.dealer,
+              "Prefer Date Slot": item.preferDateSlot
+                ? dayjs(item.preferDateSlot).locale("th").format("DD/MM/BBBB")
+                : "-",
+              "Prefer Time Slot": item.preferTimeSlot ?? "-",
+              "Is Licensed": isLC,
+              "Updated At": item.updatedAt
+                ? dayjs(item.updatedAt).format("DD/MM/BBBB HH:mm")
+                : "-",
+            };
+          })
         );
         // set column width
         ws["!cols"] = [
@@ -295,10 +376,13 @@ function AdminReportPage() {
           { wpx: 100 },
           { wpx: 150 },
           { wpx: 100 },
+          { wpx: 100 },
+          { wpx: 100 },
+          { wpx: 150 },
         ];
         // set column header style and filter data
-        ws["!autofilter"] = { ref: "A1:I1" };
-        ws["!filter"] = { ref: "A1:I1" };
+        ws["!autofilter"] = { ref: "A1:J1" };
+        ws["!filter"] = { ref: "A1:J1" };
         // set column Prefer Date Slot to date type and set date format
         XLSX.utils.book_append_sheet(wb, ws, "Report");
         const excelBuffer = XLSX.write(wb, {
@@ -320,7 +404,7 @@ function AdminReportPage() {
         setIsLoad(false);
       }
     },
-    []
+    [fetchAllData]
   );
 
   const handleSearch = useCallback(async (ps?: IAdminReportSearch) => {
@@ -469,7 +553,7 @@ function AdminReportPage() {
         width: "170px",
       },
       {
-        name: "Plan For Car Percharsing",
+        name: "Plan For Car Purchasing",
         selector: (row) =>
           row.planForCarPercharsing && row.planForCarPercharsing !== ""
             ? row.planForCarPercharsing
@@ -489,22 +573,40 @@ function AdminReportPage() {
         // custom render
         cell: (row) =>
           row.preferDateSlot
-            ? dayjs(row.preferDateSlot).format("DD MMM YYYY")
+            ? dayjs(row.preferDateSlot).locale("th").format("DD MMMM BBBB")
             : "-",
         sortable: true,
         center: true,
       },
       {
         name: "Prefer Time Slot",
-        selector: (row) => row.preferTimeSlot ?? "-",
+        selector: (row) =>
+          row.preferTimeSlot && row.preferTimeSlot !== ""
+            ? row.preferTimeSlot
+            : "-",
         sortable: false,
         center: true,
       },
       {
         name: "Is Licensed",
-        selector: (row) => (row.isLicensed ? "Yes" : "No"),
+        selector: (row) => {
+          if (row.preferTimeSlot !== null && row.preferTimeSlot !== "") {
+            return row.isLicensed ? "Yes" : "No";
+          }
+          return "-";
+        },
+        center: true,
+      },
+      {
+        name: "Updated At",
+        selector: (row) => (row.updatedAt ? dayjs(row.updatedAt).unix() : 0),
+        cell: (row) =>
+          row.updatedAt
+            ? dayjs(row.updatedAt).locale("th").format("DD MMMM BBBB HH:mm")
+            : "-",
         sortable: true,
         center: true,
+        width: "180px",
       },
     ],
     [search.search]
@@ -632,9 +734,23 @@ function AdminReportPage() {
       <div className="w-full mt-4 flex justify-end">
         <button
           onClick={() => {
-            handleDownloadExcel(users);
+            Swal.fire({
+              icon: "warning",
+              title: "ต้องการดาวน์โหลดข้อมูลทั้งหมดหรือไม่?",
+              // custom button 'ทั้งหมด' and 'บางส่วน'
+              showCancelButton: true,
+              confirmButtonText: "ทั้งหมด",
+              cancelButtonText: "แค่หน้านี้",
+            }).then((result) => {
+              if (result.isConfirmed) {
+                handleDownloadExcel(users, true);
+              } else {
+                handleDownloadExcel(users);
+              }
+            });
           }}
           className=" w-44 h-12 bg-green-500 text-white rounded-md flex items-center justify-center"
+          disabled={isLoad || users.length === 0}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -671,10 +787,81 @@ function AdminReportPage() {
           pagination
           paginationPerPage={search.limit}
           paginationTotalRows={search.totalRows}
-          paginationRowsPerPageOptions={[10, 50, 100, 200]}
+          paginationRowsPerPageOptions={[10, 50, 100, 200, 500, 1000]}
           onChangePage={handlePaginationChange}
           onChangeRowsPerPage={handlePaginationPerpageChange}
+          onRowClicked={handleSelectRow}
         />
+      </div>
+
+      {/* Modal detail */}
+      <div
+        className={`fixed top-0 left-0 z-50 w-full h-full bg-black bg-opacity-60 items-center justify-center ${
+          showModal ? "flex" : "hidden"
+        }`}
+        onClick={(e) => {
+          if (e.target === e.currentTarget) {
+            setShowModal(false);
+            setSelectedUser(null);
+          }
+        }}
+      >
+        <div className="w-1/2 bg-white p-4 rounded-lg">
+          <div className="flex justify-between border-b-2 border-b-gray-400 py-2">
+            <h1 className="text-2xl font-bold">User Detail</h1>
+            <button
+              onClick={() => {
+                setShowModal(false);
+                setSelectedUser(null);
+              }}
+              className="text-red-500"
+            >
+              Close
+            </button>
+          </div>
+          <div className="mt-4">
+            <p>Name: {selectedUser?.name}</p>
+            <p>Email: {selectedUser?.email}</p>
+            <p>Phone: {selectedUser?.phone}</p>
+            <p>Interest Model: {selectedUser?.interestModel}</p>
+            <p>
+              Plan For Car Purchasing: {selectedUser?.planForCarPercharsing}
+            </p>
+            <p>Dealer: {selectedUser?.dealer}</p>
+            <p>
+              Prefer Date Slot:{" "}
+              {selectedUser?.preferDateSlot
+                ? dayjs(selectedUser?.preferDateSlot)
+                    .locale("th")
+                    .format("DD MMMM BBBB")
+                : "-"}
+            </p>
+            <p>
+              Prefer Time Slot:{" "}
+              {selectedUser?.preferTimeSlot &&
+              selectedUser.preferTimeSlot !== ""
+                ? selectedUser.preferTimeSlot
+                : "-"}
+            </p>
+            <p>
+              Is Licensed:{" "}
+              {selectedUser?.preferTimeSlot !== null &&
+              selectedUser?.preferTimeSlot !== ""
+                ? selectedUser?.isLicensed
+                  ? "Yes"
+                  : "No"
+                : "-"}
+            </p>
+            <p>
+              Updated At:{" "}
+              {selectedUser?.updatedAt
+                ? dayjs(selectedUser?.updatedAt)
+                    .locale("th")
+                    .format("DD MMMM BBBB HH:mm")
+                : "-"}
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   );

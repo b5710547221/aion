@@ -13,8 +13,8 @@ export default function Home() {
       </div>
       <div className="w-full text-center text-3xl mt-32">
            {/* <Image alt="test" src={text1} width={350} height={100}/> */}
-           <p className="font-deacon5 text-white">Bangkok International Motor</p>
-           <p  className="font-deacon5 text-white">Show 2024</p>
+           <p className="font-deacon5 text-white">Bangkok International</p>
+           <p  className="font-deacon5 text-white">Motor Show 2024</p>
       </div>
       <div className="ml-8 mr-8">
           <Link href="/register">

@@ -204,7 +204,7 @@ const yupSchema = object().shape({
   phone: string().required("Phone is required").min(9).max(13),
   interestModel: string().required("Interest Model is required"),
   planForCarPercharsing: string().required(
-    "Plan for car percharsing is required"
+    "Plan for car purchasing is required"
   ),
   dealer: string().required("Dealer is required"),
   preferDateSlot: string().nullable(),
@@ -540,7 +540,7 @@ function Register() {
                     htmlFor="planForCarPercharsing"
                     className="font-deacon13 label-element text-blue1 absolute text-base left-2 transition-all xl:text-black bg-white px-1"
                   >
-                    Plan for car percharsing <span className="text-red">*</span>
+                    Plan for car purchasing <span className="text-red">*</span>
                   </label>
                   {errors.planForCarPercharsing &&
                     touched.planForCarPercharsing && (
