@@ -227,7 +227,7 @@ const yupSchema = object().shape({
   isLicensed: boolean(),
 });
 
-const countLimit = 1;
+const countLimit = 25;
 
 function Register() {
   const [isLoad, setIsLoad] = useState(false);
@@ -696,6 +696,7 @@ function Register() {
                       onChange={(e) => {
                         handleOnDateSlotChange(e?.value ?? "");
                         setFieldValue("preferDateSlot", e?.value ?? "");
+                        setFieldValue("preferTimeSlot", "");
                       }}
                       styles={{
                         control: (styles) => ({

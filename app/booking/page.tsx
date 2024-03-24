@@ -1,5 +1,5 @@
 "use client";
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 import dayjs from "dayjs";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -20,6 +20,20 @@ interface UserCreateDto {
   preferDateSlot?: Date | null;
   preferTimeSlot?: string | null;
   isLicensed?: boolean;
+}
+
+interface SlotCountResponse {
+  data: SlotCount[];
+  isSuccess: boolean;
+}
+
+interface SlotCount {
+  id: number;
+  preferDateSlot: string;
+  preferTimeSlot: string;
+  count: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const dateSlot: any[] = [
@@ -196,6 +210,8 @@ const timeSlot: any[] = [
   },
 ];
 
+const countLimit = 25;
+
 function Booking() {
   const query = useSearchParams();
   const router = useRouter();
@@ -209,6 +225,10 @@ function Booking() {
     return newphone;
   }, [query]);
 
+  const [dateSlotOptions, setDateSlotOptions] = useState<any[]>([...dateSlot]);
+  const [timeSlotOptions, setTimeSlotOptions] = useState<any[]>([...timeSlot]);
+  const [disableList, setDisableList] = useState<SlotCount[]>([]);
+
   const [isLoad, setLoad] = useState(false);
   const [user, setUser] = useState<UserCreateDto>({
     name: "",
@@ -221,110 +241,185 @@ function Booking() {
     preferTimeSlot: "",
     isLicensed: false,
   });
-
-  const fetchUserbyPhone = useCallback(async (p: string) => {
+  const fetchUserSlotCount = useCallback(async () => {
     try {
-      setLoad(true);
-      const response = await axios({
+      const response: AxiosResponse<SlotCountResponse> = await axios({
         method: "GET",
-        url: "https://aion-api.showkhun.com/user?phone=" + p,
-        // url: "http://localhost:4000/user?phone=" + p,
+        url:
+          "https://aion-api.showkhun.com/userSlotCount?countLimit=" +
+          countLimit,
         headers: {
           "Content-Type": "application/json; charset=utf-8",
         },
       });
-      if (response.data && response.data.isSuccess) {
-        if ((response.data?.data?.data ?? []).length > 0) {
-          setUser(response.data?.data?.data[0]);
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Oops...",
-            text: "หมายเลขนี้ยังไม่มีข้อมูลในระบบ กรุณาลงทะเบียน",
-            showConfirmButton: false,
-            timer: 1500,
-          }).then(() => {
-            router.replace("/registerAndBooking");
-            return;
-          });
-          return;
-        }
+      if (response.data && response?.data?.isSuccess) {
+        setDisableList(response.data.data);
       }
     } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Something went wrong!",
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        router.replace("/phVerify");
-      });
-      return;
-    } finally {
-      setLoad(false);
+      console.log(error);
     }
-  }, [router]);
+  }, []);
+  const handleDisableDateOption = useCallback(() => {
+    setDateSlotOptions((prev) => {
+      return prev.map((item) => {
+        if (item.value) {
+          const date = dayjs(item.value).startOf("day");
+          const today = dayjs().startOf("day");
+          if (date.isBefore(today)) {
+            return {
+              ...item,
+              isDisabled: true,
+            };
+          }
+        }
+        return item;
+      });
+    });
+  }, []);
+  const handleOnDateSlotChange = useCallback(
+    (ds: string) => {
+      const slotInDate = disableList.filter((item) => {
+        return item.preferDateSlot === ds;
+      });
+      setTimeSlotOptions((prev) => {
+        return prev.map((item) => {
+          const slot = slotInDate.find((s) => s.preferTimeSlot === item.value);
+          if (slot) {
+            return {
+              ...item,
+              isDisabled: slot.count >= countLimit,
+            };
+          }
+          return item;
+        });
+      });
+    },
+    [disableList]
+  );
+
+  const fetchUserbyPhone = useCallback(
+    async (p: string) => {
+      try {
+        setLoad(true);
+        const response = await axios({
+          method: "GET",
+          url: "https://aion-api.showkhun.com/user?phone=" + p,
+          // url: "http://localhost:4000/user?phone=" + p,
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          },
+        });
+        if (response.data && response.data.isSuccess) {
+          if ((response.data?.data?.data ?? []).length > 0) {
+            setUser(response.data?.data?.data[0]);
+            // handleOnDateSlotChange(
+            //   dayjs(response.data?.data?.data[0].preferDateSlot).format(
+            //     "YYYY-MM-DD"
+            //   )
+            // )
+          } else {
+            Swal.fire({
+              icon: "error",
+              title: "Oops...",
+              text: "หมายเลขนี้ยังไม่มีข้อมูลในระบบ กรุณาลงทะเบียน",
+              showConfirmButton: false,
+              timer: 1500,
+            }).then(() => {
+              router.replace("/registerAndBooking");
+              return;
+            });
+            return;
+          }
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          router.replace("/phVerify");
+        });
+        return;
+      } finally {
+        setLoad(false);
+      }
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    if (user.preferDateSlot) {
+      handleOnDateSlotChange(dayjs(user.preferDateSlot).format("YYYY-MM-DD"));
+    }
+  }, [handleOnDateSlotChange, user.preferDateSlot]);
 
   useEffect(() => {
     try {
       if (phone && phone.length === 10) {
-        fetchUserbyPhone(phone);
-      }
-    } catch (error) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Something went wrong!",
-        showConfirmButton: false,
-        timer: 1500,
-      }).then(() => {
-        router.replace("/phVerify");
-      });
-    }
-  }, [fetchUserbyPhone, phone, router]);
-
-  const handleUpdateData = useCallback(async (user: UserCreateDto) => {
-    try {
-      setLoad(true);
-      if (!user.id) throw new Error("User id not found");
-      if (!user.preferDateSlot) throw new Error("Prefer date slot not found");
-      if (!user.preferTimeSlot) throw new Error("Prefer time slot not found");
-
-      const response = await axios({
-        method: "PUT",
-        url: "https://aion-api.showkhun.com/user/" + user.id,
-        // url: "http://localhost:4000/user",
-        headers: {
-          "Content-Type": "application/json; charset=utf-8",
-        },
-        data: {
-          preferDateSlot: dayjs(user.preferDateSlot).format("YYYY-MM-DD"),
-          preferTimeSlot: user.preferTimeSlot,
-          isLicensed: user.isLicensed,
-        },
-      });
-      if (response.data && response.data.isSuccess) {
-        Swal.fire({
-          icon: "success",
-          title: "Success",
-          text: "",
-          showConfirmButton: false,
-          timer: 1500,
-        }).then(() => {
-          router.replace("/thankYou");
+        handleDisableDateOption();
+        fetchUserSlotCount().then(() => {
+          fetchUserbyPhone(phone);
         });
       }
     } catch (error) {
       Swal.fire({
         icon: "error",
         title: "Oops...",
-        text: (error as Error).message,
+        text: "Something went wrong!",
         showConfirmButton: false,
         timer: 1500,
-      })
+      }).then(() => {
+        router.replace("/phVerify");
+      });
     }
-  }, [router]);
+  }, [fetchUserSlotCount, fetchUserbyPhone, handleDisableDateOption, phone, router]);
+
+  const handleUpdateData = useCallback(
+    async (user: UserCreateDto) => {
+      try {
+        setLoad(true);
+        if (!user.id) throw new Error("User id not found");
+        if (!user.preferDateSlot) throw new Error("Prefer date slot not found");
+        if (!user.preferTimeSlot) throw new Error("Prefer time slot not found");
+
+        const response = await axios({
+          method: "PUT",
+          url: "https://aion-api.showkhun.com/user/" + user.id,
+          // url: "http://localhost:4000/user",
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+          },
+          data: {
+            preferDateSlot: dayjs(user.preferDateSlot).format("YYYY-MM-DD"),
+            preferTimeSlot: user.preferTimeSlot,
+            isLicensed: user.isLicensed,
+          },
+        });
+        if (response.data && response.data.isSuccess) {
+          Swal.fire({
+            icon: "success",
+            title: "Success",
+            text: "",
+            showConfirmButton: false,
+            timer: 1500,
+          }).then(() => {
+            router.replace("/thankYou");
+          });
+        }
+      } catch (error) {
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: (error as Error).message,
+          showConfirmButton: false,
+          timer: 1500,
+        });
+      }
+    },
+    [router]
+  );
 
   return (
     <div className="w-full mb-12 px-4 xl:px-8  ">
@@ -454,12 +549,14 @@ function Booking() {
                       })
                     : null
                 }
-                options={dateSlot}
+                options={dateSlotOptions}
                 className={`w-full text-gray-500 bg-white hover:bg-white focus:ring-4 rounded-lg`}
                 onChange={(e) => {
+                  handleOnDateSlotChange(e.value);
                   setUser({
                     ...user,
                     preferDateSlot: dayjs(e.value).toDate(),
+                    preferTimeSlot: "",
                   });
                 }}
                 styles={{
@@ -470,6 +567,12 @@ function Booking() {
                     borderRadius: "0.5rem",
                     height: "3.5rem",
                   }),
+                  option: (styles, { isDisabled }) => {
+                    return {
+                      ...styles,
+                      cursor: isDisabled ? "not-allowed" : "default",
+                    };
+                  },
                 }}
               />
             </div>
@@ -486,7 +589,7 @@ function Booking() {
                 id="preferTimeSlot"
                 inputId="preferTimeSlot"
                 menuPlacement="top"
-                options={timeSlot}
+                options={timeSlotOptions}
                 value={
                   user.preferTimeSlot
                     ? timeSlot.find((v) => v.value === user.preferTimeSlot)
@@ -504,6 +607,12 @@ function Booking() {
                     borderRadius: "0.5rem",
                     height: "3.5rem",
                   }),
+                  option: (styles, { isDisabled }) => {
+                    return {
+                      ...styles,
+                      cursor: isDisabled ? "not-allowed" : "default",
+                    };
+                  },
                 }}
               />
             </div>
@@ -595,7 +704,11 @@ function Booking() {
           onClick={() => {
             handleUpdateData(user);
           }}
-          disabled={!user.preferDateSlot || !user.preferTimeSlot || user.preferTimeSlot === ""}
+          disabled={
+            !user.preferDateSlot ||
+            !user.preferTimeSlot ||
+            user.preferTimeSlot === ""
+          }
         >
           SUBMIT
         </button>
