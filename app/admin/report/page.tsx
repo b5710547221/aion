@@ -198,14 +198,6 @@ const timeSlot: any[] = [
     value: "17:30",
     label: "17:30",
   },
-  {
-    value: "17:45",
-    label: "17:45",
-  },
-  {
-    value: "18:00",
-    label: "18:00",
-  },
 ];
 
 interface UserCreateDto {
@@ -277,6 +269,8 @@ function AdminReportPage() {
         return "bookingAt";
       case "Register Time":
         return "createdAt";
+      case "No.":
+        return "id";
       default:
         return "name";
     }
@@ -350,12 +344,14 @@ function AdminReportPage() {
         // create a new workbook with filter header and remap column name
         const wb = XLSX.utils.book_new();
         const ws = XLSX.utils.json_to_sheet(
-          dats.map((item) => {
+          dats.map((item, i) => {
             let isLC = "-";
             if (item.preferTimeSlot !== null && item.preferTimeSlot !== "") {
               isLC = item.isLicensed ? "Yes" : "No";
             }
             return {
+              // "No." is auto increment
+              "No.": i + 1,
               Name: item.name,
               Email: item.email,
               Phone: item.phone,
@@ -381,22 +377,23 @@ function AdminReportPage() {
         );
         // set column width
         ws["!cols"] = [
-          { wpx: 150 },
-          { wpx: 150 },
-          { wpx: 100 },
+          { wpx: 80 },
           { wpx: 150 },
           { wpx: 100 },
           { wpx: 150 },
           { wpx: 100 },
+          { wpx: 150 },
           { wpx: 100 },
           { wpx: 100 },
+          { wpx: 100 },
+          { wpx: 150 },
           { wpx: 150 },
           { wpx: 150 },
           { wpx: 150 },
         ];
         // set column header style and filter data
-        ws["!autofilter"] = { ref: "A1:J1" };
-        ws["!filter"] = { ref: "A1:J1" };
+        ws["!autofilter"] = { ref: "A1:M1" };
+        ws["!filter"] = { ref: "A1:M1" };
         // set column Prefer Date Slot to date type and set date format
         XLSX.utils.book_append_sheet(wb, ws, "Report");
         const excelBuffer = XLSX.write(wb, {
@@ -524,6 +521,17 @@ function AdminReportPage() {
   const columns: TableColumn<UserCreateDto>[] = useMemo(
     () => [
       {
+        name: "No.",
+        // selector: (row) => row.id,
+        // auto increment
+        cell: (_row, index) => {
+          const page = search.offset === 0 ? 0 : search.offset / search.limit;
+          return <span>{page * search.limit + (index + 1)}</span>;
+        },
+        width: "70px",
+        right: true,
+      },
+      {
         name: "Name",
         // custom header
         customHeader: (column: any) => {
@@ -650,7 +658,7 @@ function AdminReportPage() {
         width: "170px",
       },
     ],
-    [search.search]
+    [search.limit, search.offset, search.search]
   );
 
   return (

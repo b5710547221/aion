@@ -172,15 +172,7 @@ const timeSlot: any[] = [
   {
     value: "17:30",
     label: "17:30",
-  },
-  {
-    value: "17:45",
-    label: "17:45",
-  },
-  {
-    value: "18:00",
-    label: "18:00",
-  },
+  }
 ];
 
 interface SlotCountResponse {
@@ -637,13 +629,14 @@ function Register() {
                         { value: "V Group", label: "V Group" },
                         { value: "Gold integrate", label: "Gold integrate" },
                         { value: "Harmony", label: "Harmony" },
-                        { value: "Sensu", label: "Sensu" },
+                        // { value: "Sensu", label: "Sensu" },
                         {
                           value: "Rungcharoen star ev",
                           label: "Rungcharoen star ev",
                         },
                         { value: "Milestone", label: "Milestone" },
                         { value: "Hangthaithada", label: "Hangthaithada" },
+                        { value: "Auto Gallery ", label: "Auto Gallery " },
                       ]}
                       className={`w-full text-gray-500 border ${
                         errors.dealer && touched.dealer ? "border-red" : ""

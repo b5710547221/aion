@@ -199,15 +199,7 @@ const timeSlot: any[] = [
   {
     value: "17:30",
     label: "17:30",
-  },
-  {
-    value: "17:45",
-    label: "17:45",
-  },
-  {
-    value: "18:00",
-    label: "18:00",
-  },
+  }
 ];
 
 const countLimit = 25;
@@ -590,12 +582,15 @@ function Booking() {
                 inputId="preferTimeSlot"
                 menuPlacement="top"
                 options={timeSlotOptions}
+                isDisabled={user.preferDateSlot === null}
                 value={
                   user.preferTimeSlot
                     ? timeSlot.find((v) => v.value === user.preferTimeSlot)
                     : null
                 }
-                className={`w-full text-gray-500 bg-white hover:bg-white focus:ring-4 rounded-lg`}
+                className={`w-full text-gray-500 ${
+                  user.preferDateSlot ? "" : "bg-gray-100 border-red border"
+                } bg-white hover:bg-white focus:ring-4 rounded-lg`}
                 onChange={(e) => {
                   setUser({ ...user, preferTimeSlot: e.value });
                 }}
