@@ -628,7 +628,7 @@ function Register() {
                       options={[
                         { value: "V Group", label: "V Group" },
                         { value: "Gold integrate", label: "Gold integrate" },
-                        { value: "Harmony", label: "Harmony" },
+                        // { value: "Harmony", label: "Harmony" },
                         { value: "Sensu", label: "Sensu" },
                         {
                           value: "Rungcharoen star ev",
